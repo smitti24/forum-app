@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text;
+using Forum.Api.Common;
 using Forum.Api.Domain;
 using Forum.Api.Persistence;
 using Microsoft.AspNetCore.Identity;
@@ -173,9 +174,7 @@ public static class AuthEndpoints
 
     private static async Task<IResult> MeAsync(ClaimsPrincipal principal, ForumDbContext db, CancellationToken ct)
     {
-        var id = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (!Guid.TryParse(id, out var memberId))
+        if (principal.MemberId() is not { } memberId)
         {
             return Results.Unauthorized();
         }
