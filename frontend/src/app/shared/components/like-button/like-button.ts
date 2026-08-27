@@ -5,13 +5,16 @@ type LikeState = 'guest' | 'own-post' | 'liked' | 'rest';
 
 @Component({
   selector: 'app-like-button',
+  host: { class: 'flex' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <button
-      class="flex h-[46px] flex-1 items-center justify-center gap-[7px] border-r-2 border-black text-[13px] font-bold tracking-[0.04em] uppercase"
+      class="flex h-[46px] w-full items-center justify-center gap-[7px] border-black px-4 text-[13px] font-bold tracking-[0.04em] uppercase"
       [style.background]="state() === 'liked' ? 'var(--nb-primary)' : '#fff'"
       [class.opacity-45]="state() === 'own-post'"
       [class.cursor-not-allowed]="state() === 'own-post'"
+      [class.border-r-2]="state() !== 'guest'"
+      [class.border-2]="state() === 'guest'"
       [class.border-dashed]="state() === 'guest'"
       [disabled]="state() === 'own-post'"
       [attr.aria-label]="label()"
