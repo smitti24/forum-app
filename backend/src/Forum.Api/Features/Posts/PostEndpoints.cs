@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Forum.Api.Common;
 using Forum.Api.Domain;
+using Forum.Api.Features.Comments;
 using Forum.Api.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,8 +13,6 @@ public static class PostEndpoints
     public const int MaxBodyLength = 10_000;
 
     public record CreatePostRequest(string Title, string Body);
-
-    public record AuthorSummary(Guid Id, string Username);
 
     public record FlagSummary(string FlaggedBy, DateTime FlaggedAt);
 
@@ -28,6 +27,18 @@ public static class PostEndpoints
         bool LikedByCurrentMember,
         FlagSummary? Flag);
 
+    public record PostDetailResponse(
+        Guid Id,
+        string Title,
+        string Body,
+        AuthorSummary Author,
+        DateTime CreatedAt,
+        int LikeCount,
+        int CommentCount,
+        bool LikedByCurrentMember,
+        FlagSummary? Flag,
+        Paged<CommentEndpoints.CommentResponse> Comments);
+
     public static RouteGroupBuilder MapPosts(this RouteGroupBuilder group)
     {
         group.MapPost("/", CreateAsync)
@@ -36,7 +47,7 @@ public static class PostEndpoints
 
         group.MapGet("/{id:guid}", GetAsync)
             .AllowAnonymous()
-            .WithSummary("Read a single post.");
+            .WithSummary("Read a single post with its first page of comments.");
 
         return group;
     }
@@ -126,7 +137,24 @@ public static class PostEndpoints
                 p.IsFlagged ? new FlagSummary(p.FlaggedBy!.Username, p.FlaggedAt!.Value) : null))
             .SingleOrDefaultAsync(ct);
 
-        return post is null ? NotFound() : Results.Ok(post);
+        if (post is null)
+        {
+            return NotFound();
+        }
+
+        var comments = await CommentEndpoints.PageAsync(db, id, page: null, pageSize: null, ct);
+
+        return Results.Ok(new PostDetailResponse(
+            post.Id,
+            post.Title,
+            post.Body,
+            post.Author,
+            post.CreatedAt,
+            post.LikeCount,
+            post.CommentCount,
+            post.LikedByCurrentMember,
+            post.Flag,
+            comments));
     }
 
     internal static IResult NotFound() =>
