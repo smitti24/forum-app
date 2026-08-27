@@ -32,9 +32,19 @@ It serves **http://localhost:4200** and proxies `/api` to the backend, so both h
 ### Tests
 
 ```bash
-cd backend && dotnet test      # 112 tests
-cd frontend && npm test
+cd backend  && dotnet test     # 116 tests, against real SQLite
+cd frontend && npm test        # 20 tests, Vitest
 ```
+
+### Seeing it work
+
+With both halves running, open **http://localhost:4200**:
+
+1. **Browse anonymously** — the feed lists seven posts. Filter by author, by date range or by flag state, and sort by newest, oldest or most liked. Open a post to read its comments.
+2. **Try to like or comment while signed out** — you are told to sign in rather than the action silently failing.
+3. **Sign in as `bmokoena`** — like one of `asmith`'s posts. Liking it a second time conflicts and the count stays put; liking your own post is refused outright.
+4. **Sign in as `moderator`** — flagging controls appear that no other account sees. Flag a post: it stays readable, keeps accepting comments and likes, and carries its flag everywhere it appears.
+5. **The already-flagged post** — *"Liveness checks work fine on a printed photograph"* is flagged out of the box, so the flagged state is visible before you moderate anything yourself.
 
 ## Seeded accounts
 
@@ -74,9 +84,13 @@ Business-rule violations carry distinct status codes from validation failures, s
 
 ### Postman
 
-`postman/iidentifii-forum.postman_collection.json` covers every endpoint. Import it, run **Login**, and the access token is captured into a collection variable that every later request uses. **Create post** captures the new id, so the comment, like and flag requests work without copying anything by hand. The list requests include disabled query parameters for each filter — enable them to see filtering and sorting.
+**Published collection:** <!-- TODO: paste the public Postman link here before submitting -->
 
-`backend/openapi.json` is the generated OpenAPI document, committed so it can be read without running anything.
+`postman/iidentifii-forum.postman_collection.json` covers every endpoint and can be imported directly. Run **Login** and the access token is captured into a collection variable that every later request uses. **Create post** captures the new id, so the comment, like and flag requests work without copying anything by hand. The list requests carry disabled query parameters for each filter — enable them to see filtering and sorting, plus a request that demonstrates a rejected sort value.
+
+To exercise moderation, set the `username` collection variable to `moderator` and run **Login** again.
+
+`backend/openapi.json` is the generated OpenAPI document, committed so the contract can be read without running anything. It is regenerated from `/openapi/v1.json` whenever a response shape changes.
 
 ## How it is built, and why
 
@@ -134,11 +148,49 @@ Conventional `page`/`pageSize` with a total. Third-party consumption is first-cl
 
 ### Testing
 
-112 backend tests run against **real SQLite**, driving real HTTP endpoints, each named as the requirement it defends.
+116 backend tests run against **real SQLite**, driving real HTTP endpoints, each named as the requirement it defends. The front-end adds 20, covering the auth interceptor, the route guard, contract parsing and the feed's states.
 
 The EF Core in-memory provider is not used anywhere. It enforces neither unique indexes nor referential integrity, so the central like rule — a composite primary key — would pass against it while failing for real. A test that cannot fail for the right reason is worse than no test.
 
 Where a claim is about generated SQL rather than results, the test asserts the SQL: that ordering and range filtering translate rather than falling back to the client, and that list endpoints contain no `COUNT(` because counts are read from denormalised columns.
+
+The **20 front-end tests** are deliberately narrow, covering the three things most likely to break silently: the interceptor attaches the token and does not leak it to a non-API host; the guards redirect by authentication and by role; and the feed renders each of loading, empty, error and populated. One asserts that a response breaking the contract reaches the designed error state rather than a blank screen, which is the behaviour the Zod boundary exists to produce.
+
+Browser end-to-end automation is out of scope; end-to-end verification is a manual pass through the UI and Postman.
+
+### The web client
+
+Angular 21, standalone and **zoneless**, with signals throughout and no `NgModule` anywhere. Code is organised by feature rather than by kind — `features/posts`, `features/auth` — so a capability is one folder rather than a trail through four. `core/` holds infrastructure and never imports from `features/`; `shared/` holds the components the design system names and never reaches into a feature's data layer.
+
+*Rejected:* NgRx, or any store. Almost everything here is **server state**, not client state, and a store would add a second copy of it plus a cache-invalidation problem nobody asked for. The genuine client state is a token, a filter object and a few form drafts — each a signal, owned by the thing that uses it.
+
+*On the version:* Angular 21 rather than 22. `@ng-brutalism/ui` declares a `^21` peer, and Angular 22's CLI requires a newer Node than this machine runs. The library is in fact v22-clean — its partial-Ivy `minVersion` tops out at 17.2.0 and it imports only v22-stable API — so the upgrade is a CLI migration, not a rewrite.
+
+### Server state through the resource API
+
+Reads are `httpResource`, which exposes a request as signals for value, loading and error, re-fetches when its parameters signal changes, and aborts the outstanding request when it does. The feed's filters are one signal; changing a filter *is* the refetch. Writes — like, comment, flag, publish — are plain `HttpClient` calls followed by a reload.
+
+That split is deliberate. A like is a command, not a reactive read, and modelling every mutation as a resource is where signal-based codebases usually go wrong.
+
+### The API contract is checked at runtime
+
+Every response is parsed by a **Zod** schema at the boundary, at the resource's own parse point, before it reaches a signal. TypeScript types are erased at runtime and describe only what the client *hopes* it will receive; the schemas describe what actually arrived.
+
+This was not theoretical. While the two halves were built in parallel the wire contract moved twice — the role's casing, whether registration returned a token, whether an author was a string or an object — and none of it was catchable at build time. With validation at the boundary each change failed loudly on the first call, naming the field, instead of rendering `undefined` three components later. The same schemas validate the forms, so client and server rules cannot drift apart.
+
+### The token lives in memory
+
+The access token is held in a signal in an injectable store, never in `localStorage` and never in a cookie. An XSS anywhere in the client cannot lift it out of storage, and a refresh ends the session — the honest consequence of having no refresh token rather than an oversight.
+
+An interceptor attaches it, and only to requests whose URL starts with the API base, so it cannot leak to a third-party host. A route guard protects authenticated routes and a second protects moderation by role. **The role decides what renders; the server decides what works** — every protected endpoint re-checks, and the client's guard is a courtesy to the user, not a security boundary.
+
+### The interface
+
+Built against `design-system/`, which carries the token spec, a component sheet and a wired demo of every screen. Art direction lives in CSS custom properties overridden once at `:root`; **no component owns a stylesheet**, so the system's one styling rule holds structurally rather than by discipline.
+
+Every list has four designed states — loading, empty, error, populated. Loading is a bordered skeleton shaped like the content it replaces, never a spinner; empty and error each carry an icon tile, a sentence, and the one action that resolves them. The like button owns the one-like rule and renders all four of its states, including the two where it refuses: your own post, and not signed in.
+
+Two things in the design were deliberately not built, because the domain does not have them: post categories and tags (the brief's "tags" is moderator flagging, which the glossary calls a flag, and there is no user-applied taxonomy), and likes on comments (only posts carry likes). Building either would have meant inventing an API to back it.
 
 ## Known limitations
 
@@ -154,6 +206,9 @@ Deliberate omissions, not oversights. Each is roughly one slice to add.
 - **The JWT signing key is in `appsettings.json`.** Fine for a proof of concept and self-evidently a development value; it belongs in user-secrets or a key vault before any real deployment.
 - **Post bodies are plain text.** No markup is accepted and no raw HTML is ever bound. Supporting Markdown needs a sanitiser, which is a decision rather than a detail.
 - **No password reset, 2FA, social login, full-text search, or nested comments.** Out of scope.
+- **A refresh signs you out.** The token is deliberately held only in memory, so there is no session to restore. This is the visible cost of the no-refresh-token decision.
+- **The front-end has no route-level data resolvers or optimistic updates.** A like round-trips before the count moves. Optimistic mutation with rollback on a 409 is designed in the design system and was not built.
+- **No browser end-to-end tests.** Component and unit tests only.
 - **No deployment.** No container definitions; the README is the setup contract.
 
 ## Layout
@@ -165,9 +220,12 @@ backend/
     Features/        Auth, Posts, Comments, Likes, Moderation — one folder per capability
     Persistence/     ForumDbContext, migrations, seeder
     Program.cs       composition root
-  tests/Forum.Tests/ 112 integration and unit tests
+  tests/Forum.Tests/ 116 integration and unit tests
   openapi.json       generated contract
-frontend/            Angular client
+frontend/
+  src/app/core/      infrastructure: api client, auth store, guards, interceptor
+  src/app/features/  auth, posts, moderation, profile — one folder per capability
+  src/app/shared/    the components the design system names
 postman/             importable collection
 design-system/       design tokens, component spec and screen demos
 ```
