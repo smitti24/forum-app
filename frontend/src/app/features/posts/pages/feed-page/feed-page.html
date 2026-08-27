@@ -1,0 +1,54 @@
+<div class="flex flex-col gap-4">
+  <app-filter-bar
+    [filters]="filters()"
+    [total]="posts.value()?.total ?? 0"
+    (filtersChange)="patchFilters($event)"
+    (clear)="clearFilters()"
+  />
+
+  @if (posts.isLoading()) {
+    <app-skeleton-list [count]="5" />
+  } @else if (posts.error()) {
+    <app-error-state (retry)="posts.reload()" />
+  } @else if (posts.hasValue()) {
+    @let page = posts.value()!;
+
+    @if (page.items.length === 0) {
+      <app-empty-state headline="No posts yet" message="Nothing matches these filters." />
+    } @else {
+      @for (post of page.items; track post.id) {
+        <app-post-card
+          [post]="post"
+          [isAuthenticated]="auth.isAuthenticated()"
+          [isModerator]="auth.isModerator()"
+          [currentMemberId]="auth.memberId()"
+          (toggleLike)="toggleLike(post.id, post.likedByCurrentMember)"
+          (flagPost)="setFlag(post.id, false)"
+          (unflag)="setFlag(post.id, true)"
+        />
+      }
+
+      <div class="flex items-center justify-between border-2 border-black bg-white p-3">
+        <button
+          class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase disabled:opacity-45"
+          type="button"
+          [disabled]="page.page <= 1"
+          (click)="patchFilters({ page: page.page - 1 })"
+        >
+          Previous
+        </button>
+        <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">
+          Page {{ page.page }} · {{ page.total }} total
+        </span>
+        <button
+          class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase disabled:opacity-45"
+          type="button"
+          [disabled]="page.page * page.pageSize >= page.total"
+          (click)="patchFilters({ page: page.page + 1 })"
+        >
+          Next
+        </button>
+      </div>
+    }
+  }
+</div>

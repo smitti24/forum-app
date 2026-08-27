@@ -1,0 +1,25 @@
+<form nbStack gap="md" class="border-2 border-black bg-white p-4" (submit)="$event.preventDefault(); submit()">
+  <h1 class="text-[30px] font-bold tracking-[-0.03em] uppercase">New post</h1>
+
+  <label class="flex flex-col gap-1">
+    <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">Title</span>
+    <input nbInput type="text" [value]="title()" (input)="title.set($any($event.target).value)" />
+    @for (message of errors()['title'] ?? []; track message) {
+      <span class="text-[13px] font-medium text-[var(--nb-danger)]">{{ message }}</span>
+    }
+  </label>
+
+  <label class="flex flex-col gap-1">
+    <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">Body</span>
+    <textarea nbTextarea rows="8" [value]="body()" (input)="body.set($any($event.target).value)"></textarea>
+    @for (message of errors()['body'] ?? []; track message) {
+      <span class="text-[13px] font-medium text-[var(--nb-danger)]">{{ message }}</span>
+    }
+  </label>
+
+  @for (message of errors()['form'] ?? []; track message) {
+    <span class="text-[13px] font-medium text-[var(--nb-danger)]">{{ message }}</span>
+  }
+
+  <button nbButton tone="primary" type="submit" [disabled]="submitting()">Post</button>
+</form>

@@ -1,0 +1,42 @@
+<article nbSurface shadow="default" padding="none" [class.opacity-80]="post().flag">
+  <div nbCluster align="center" gap="sm" padding="sm">
+    <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">
+      {{ post().author.username }}
+    </span>
+    <span class="font-mono text-[11px] font-medium tracking-[0.06em] uppercase opacity-70">
+      {{ post().createdAt | date: 'short' }}
+    </span>
+  </div>
+
+  @if (post().flag || isModerator()) {
+    <div class="border-t-2 border-black p-3">
+      <app-moderation-bar
+        [flag]="post().flag"
+        [isModerator]="isModerator()"
+        (flagPost)="flagPost.emit()"
+        (unflag)="unflag.emit()"
+      />
+    </div>
+  }
+
+  <div nbStack gap="sm" class="border-t-2 border-black p-3">
+    @if (linkToDetail()) {
+      <a [routerLink]="['/posts', post().id]" class="text-[18px] font-bold">{{ post().title }}</a>
+    } @else {
+      <h1 class="text-[18px] font-bold">{{ post().title }}</h1>
+    }
+    <p class="text-[15px] font-medium whitespace-pre-line">{{ post().body }}</p>
+  </div>
+
+  <div nbSplit align="center" padding="sm" class="border-t-2 border-black">
+    <app-like-button
+      [post]="post()"
+      [isAuthenticated]="isAuthenticated()"
+      [currentMemberId]="currentMemberId()"
+      (toggle)="toggleLike.emit()"
+    />
+    <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">
+      {{ post().commentCount }} comments
+    </span>
+  </div>
+</article>

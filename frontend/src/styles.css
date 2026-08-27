@@ -1,0 +1,17 @@
+@import 'tailwindcss';
+@import '@ng-brutalism/ui/styles.css';
+
+:root {
+  --nb-primary: #ff90e8;
+  --nb-secondary: #c8a2ff;
+  --nb-accent: #8ae9ff;
+  --nb-warning: #ff9c42;
+  --nb-success: #63e6be;
+  --nb-danger: #ff4f8a;
+  --nb-main: oklch(90% 0.15 95);
+  --nb-field-bg: #faf3d6;
+  --nb-surface: #ffffff;
+  --nb-secondary-background: oklch(96% 0 0);
+  --nb-radius: 0rem;
+  --nb-border-width: 2px;
+}

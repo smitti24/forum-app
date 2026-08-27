@@ -1,0 +1,28 @@
+<form nbStack gap="md" class="mx-auto max-w-md border-2 border-black bg-white p-4"
+      (submit)="$event.preventDefault(); submit()">
+  <h1 class="text-[30px] font-bold tracking-[-0.03em] uppercase">Sign in</h1>
+
+  <label class="flex flex-col gap-1">
+    <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">Username or email</span>
+    <input nbInput type="text" autocomplete="username"
+           [value]="identifier()" (input)="identifier.set($any($event.target).value)" />
+    @for (message of errors()['identifier'] ?? []; track message) {
+      <span class="text-[13px] font-medium text-[var(--nb-danger)]">{{ message }}</span>
+    }
+  </label>
+
+  <label class="flex flex-col gap-1">
+    <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">Password</span>
+    <input nbInput type="password" autocomplete="current-password"
+           [value]="password()" (input)="password.set($any($event.target).value)" />
+    @for (message of errors()['password'] ?? []; track message) {
+      <span class="text-[13px] font-medium text-[var(--nb-danger)]">{{ message }}</span>
+    }
+  </label>
+
+  @for (message of errors()['form'] ?? []; track message) {
+    <span class="text-[13px] font-medium text-[var(--nb-danger)]">{{ message }}</span>
+  }
+
+  <button nbButton tone="primary" type="submit" [disabled]="submitting()">Sign in</button>
+</form>

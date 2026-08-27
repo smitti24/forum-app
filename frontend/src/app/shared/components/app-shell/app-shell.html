@@ -1,0 +1,24 @@
+<div class="min-h-dvh bg-[var(--nb-secondary-background)]">
+  <header nbSurface tone="yellow" shadow="hard" edge="bottom" padding="sm">
+    <div nbSplit align="center" class="mx-auto w-full max-w-[1180px]">
+      <a routerLink="/" class="font-mono text-xl font-bold tracking-[-0.03em] uppercase">Forum</a>
+
+      <nav nbCluster gap="sm" align="center">
+        @if (auth.isAuthenticated()) {
+          <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">
+            {{ auth.member()?.username }}
+          </span>
+          <a nbButton tone="primary" size="sm" routerLink="/posts/new">New post</a>
+          <button nbButton tone="white" size="sm" type="button" (click)="logout()">Sign out</button>
+        } @else {
+          <a nbButton tone="white" size="sm" routerLink="/login" routerLinkActive="font-bold">Sign in</a>
+          <a nbButton tone="primary" size="sm" routerLink="/register">Register</a>
+        }
+      </nav>
+    </div>
+  </header>
+
+  <main class="mx-auto w-full max-w-[1180px] p-4">
+    <router-outlet />
+  </main>
+</div>
