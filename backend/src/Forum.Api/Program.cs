@@ -4,6 +4,7 @@ using Forum.Api.Domain;
 using Forum.Api.Features.Auth;
 using Forum.Api.Features.Comments;
 using Forum.Api.Features.Likes;
+using Forum.Api.Features.Moderation;
 using Forum.Api.Features.Posts;
 using Forum.Api.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -78,7 +79,7 @@ app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 var v1 = app.MapGroup("/api/v1");
 
 v1.MapGroup("/auth").WithTags("Authentication").MapAuth();
-v1.MapGroup("/posts").WithTags("Posts").MapPosts().MapComments().MapLikes();
+v1.MapGroup("/posts").WithTags("Posts").MapPosts().MapComments().MapLikes().MapFlags();
 
 app.Run();
 

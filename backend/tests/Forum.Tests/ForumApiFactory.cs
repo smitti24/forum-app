@@ -30,6 +30,36 @@ public class ForumApiFactory : WebApplicationFactory<Program>
         builder.UseSetting("RateLimiting:CredentialAttemptsPerMinute", CredentialAttemptsPerMinute.ToString());
     }
 
+    public async Task<string> RegisterModeratorAndLoginAsync(
+        HttpClient client,
+        string username,
+        string password = "a-long-enough-password")
+    {
+        await client.PostAsJsonAsync("/api/v1/auth/register", new
+        {
+            email = $"{username}@example.com",
+            username,
+            password
+        });
+
+        await WithDbAsync(async db =>
+        {
+            var member = await db.Members.SingleAsync(m => m.UsernameNormalized == username.ToLowerInvariant());
+            member.Role = Forum.Api.Domain.MemberRole.Moderator;
+            await db.SaveChangesAsync();
+        });
+
+        var response = await client.PostAsJsonAsync("/api/v1/auth/login", new
+        {
+            identifier = username,
+            password
+        });
+
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>();
+
+        return body.GetProperty("token").GetString()!;
+    }
+
     public async Task<string> RegisterAndLoginAsync(
         HttpClient client,
         string username,
