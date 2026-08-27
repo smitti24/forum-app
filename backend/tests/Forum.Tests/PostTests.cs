@@ -25,10 +25,11 @@ public class PostTests
 
         var body = await response.Content.ReadFromJsonAsync<JsonElement>();
         Assert.Equal("Liveness checks and retries", body.GetProperty("title").GetString());
-        Assert.Equal("asmith", body.GetProperty("author").GetString());
+        Assert.Equal("asmith", body.GetProperty("author").GetProperty("username").GetString());
         Assert.Equal(0, body.GetProperty("likeCount").GetInt32());
         Assert.Equal(0, body.GetProperty("commentCount").GetInt32());
-        Assert.False(body.GetProperty("isFlagged").GetBoolean());
+        Assert.False(body.GetProperty("likedByCurrentMember").GetBoolean());
+        Assert.Equal(JsonValueKind.Null, body.GetProperty("flag").ValueKind);
     }
 
     [Fact]
@@ -59,7 +60,7 @@ public class PostTests
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var body = await response.Content.ReadFromJsonAsync<JsonElement>();
-        Assert.Equal("asmith", body.GetProperty("author").GetString());
+        Assert.Equal("asmith", body.GetProperty("author").GetProperty("username").GetString());
     }
 
     [Fact]
@@ -141,7 +142,7 @@ public class PostTests
                 })
                 .ToQueryString()));
 
-        Assert.Equal(1, CountOccurrences(sql, "SELECT"));
+        Assert.DoesNotContain("COUNT(", sql, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("JOIN", sql);
     }
 

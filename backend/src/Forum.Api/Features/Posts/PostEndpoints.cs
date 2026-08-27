@@ -13,15 +13,20 @@ public static class PostEndpoints
 
     public record CreatePostRequest(string Title, string Body);
 
+    public record AuthorSummary(Guid Id, string Username);
+
+    public record FlagSummary(string FlaggedBy, DateTime FlaggedAt);
+
     public record PostResponse(
         Guid Id,
         string Title,
         string Body,
-        string Author,
+        AuthorSummary Author,
         DateTime CreatedAt,
-        bool IsFlagged,
         int LikeCount,
-        int CommentCount);
+        int CommentCount,
+        bool LikedByCurrentMember,
+        FlagSummary? Flag);
 
     public static RouteGroupBuilder MapPosts(this RouteGroupBuilder group)
     {
@@ -89,28 +94,36 @@ public static class PostEndpoints
             post.Id,
             post.Title,
             post.Body,
-            username,
+            new AuthorSummary(memberId, username),
             post.CreatedAt,
-            post.IsFlagged,
             post.LikeCount,
-            post.CommentCount);
+            post.CommentCount,
+            LikedByCurrentMember: false,
+            Flag: null);
 
         return Results.Created($"/api/v1/posts/{post.Id}", response);
     }
 
-    private static async Task<IResult> GetAsync(Guid id, ForumDbContext db, CancellationToken ct)
+    private static async Task<IResult> GetAsync(
+        Guid id,
+        ClaimsPrincipal principal,
+        ForumDbContext db,
+        CancellationToken ct)
     {
+        var memberId = principal.MemberId();
+
         var post = await db.Posts
             .Where(p => p.Id == id)
             .Select(p => new PostResponse(
                 p.Id,
                 p.Title,
                 p.Body,
-                p.Author.Username,
+                new AuthorSummary(p.AuthorId, p.Author.Username),
                 p.CreatedAt,
-                p.IsFlagged,
                 p.LikeCount,
-                p.CommentCount))
+                p.CommentCount,
+                memberId != null && p.Likes.Any(l => l.MemberId == memberId),
+                p.IsFlagged ? new FlagSummary(p.FlaggedBy!.Username, p.FlaggedAt!.Value) : null))
             .SingleOrDefaultAsync(ct);
 
         return post is null ? NotFound() : Results.Ok(post);

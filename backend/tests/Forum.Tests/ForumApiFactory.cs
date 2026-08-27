@@ -50,7 +50,7 @@ public class ForumApiFactory : WebApplicationFactory<Program>
 
         var body = await response.Content.ReadFromJsonAsync<JsonElement>();
 
-        return body.GetProperty("accessToken").GetString()!;
+        return body.GetProperty("token").GetString()!;
     }
 
     public async Task<T> WithDbAsync<T>(Func<ForumDbContext, Task<T>> work)

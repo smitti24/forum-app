@@ -18,13 +18,16 @@ public static class AuthEndpoints
     private const string AlreadyTaken = "That email address or username is already taken.";
     private const string BadCredentials = "That identifier and password combination is not recognised.";
 
+    private const string DummyHash =
+        "AQAAAAIAAYagAAAAELbcgxaLnGZ8h3sQKJyJx8pQEo0mCPGmC9pAPRs4bWQpCyGyDJmXeQVbxvOxaJmQpg==";
+
     public record RegisterRequest(string Email, string Username, string Password);
 
     public record LoginRequest(string Identifier, string Password);
 
-    public record RegisteredResponse(Guid Id, string Username);
+    public record MemberSummary(Guid Id, string Username, string Email, string Role);
 
-    public record TokenResponse(string AccessToken, DateTime ExpiresAt, string Username, string Role);
+    public record AuthResponse(string Token, DateTime ExpiresAt, MemberSummary Member);
 
     public record ProfileResponse(Guid Id, string Username, string Email, string Role, DateTime CreatedAt);
 
@@ -33,7 +36,7 @@ public static class AuthEndpoints
         group.MapPost("/register", RegisterAsync)
             .AllowAnonymous()
             .RequireRateLimiting(CredentialsRateLimit)
-            .WithSummary("Register a new member.");
+            .WithSummary("Register a new member and receive an access token.");
 
         group.MapPost("/login", LoginAsync)
             .AllowAnonymous()
@@ -51,6 +54,7 @@ public static class AuthEndpoints
         RegisterRequest request,
         ForumDbContext db,
         IPasswordHasher<Member> hasher,
+        IConfiguration configuration,
         TimeProvider clock,
         CancellationToken ct)
     {
@@ -102,7 +106,7 @@ public static class AuthEndpoints
 
         if (taken)
         {
-            return Results.Problem(title: "Conflict", detail: AlreadyTaken, statusCode: StatusCodes.Status409Conflict);
+            return Conflict();
         }
 
         var member = new Member
@@ -127,12 +131,10 @@ public static class AuthEndpoints
         catch (DbUpdateException e)
             when (e.InnerException is SqliteException { SqliteExtendedErrorCode: 2067 or 1555 })
         {
-            return Results.Problem(title: "Conflict", detail: AlreadyTaken, statusCode: StatusCodes.Status409Conflict);
+            return Conflict();
         }
 
-        return Results.Created(
-            $"/api/v1/members/{Uri.EscapeDataString(member.Username)}",
-            new RegisteredResponse(member.Id, member.Username));
+        return Results.Created($"/api/v1/members/{Uri.EscapeDataString(member.Username)}", Authenticate(member, configuration, clock));
     }
 
     private static async Task<IResult> LoginAsync(
@@ -160,16 +162,12 @@ public static class AuthEndpoints
             return Unauthorised();
         }
 
-        var verification = hasher.VerifyHashedPassword(member, member.PasswordHash, request.Password);
-
-        if (verification == PasswordVerificationResult.Failed)
+        if (hasher.VerifyHashedPassword(member, member.PasswordHash, request.Password) == PasswordVerificationResult.Failed)
         {
             return Unauthorised();
         }
 
-        var (token, expiresAt) = CreateToken(member, configuration, clock);
-
-        return Results.Ok(new TokenResponse(token, expiresAt, member.Username, member.Role.ToString()));
+        return Results.Ok(Authenticate(member, configuration, clock));
     }
 
     private static async Task<IResult> MeAsync(ClaimsPrincipal principal, ForumDbContext db, CancellationToken ct)
@@ -181,11 +179,31 @@ public static class AuthEndpoints
 
         var profile = await db.Members
             .Where(m => m.Id == memberId)
-            .Select(m => new ProfileResponse(m.Id, m.Username, m.Email, m.Role.ToString(), m.CreatedAt))
+            .Select(m => new ProfileResponse(
+                m.Id,
+                m.Username,
+                m.Email,
+                m.Role == MemberRole.Moderator ? "moderator" : "member",
+                m.CreatedAt))
             .SingleOrDefaultAsync(ct);
 
         return profile is null ? Results.Unauthorized() : Results.Ok(profile);
     }
+
+    private static AuthResponse Authenticate(Member member, IConfiguration configuration, TimeProvider clock)
+    {
+        var (token, expiresAt) = CreateToken(member, configuration, clock);
+
+        return new AuthResponse(
+            token,
+            expiresAt,
+            new MemberSummary(member.Id, member.Username, member.Email, RoleName(member.Role)));
+    }
+
+    private static string RoleName(MemberRole role) => role == MemberRole.Moderator ? "moderator" : "member";
+
+    private static IResult Conflict() =>
+        Results.Problem(title: "Conflict", detail: AlreadyTaken, statusCode: StatusCodes.Status409Conflict);
 
     private static IResult Unauthorised() =>
         Results.Problem(title: "Unauthenticated", detail: BadCredentials, statusCode: StatusCodes.Status401Unauthorized);
@@ -208,14 +226,11 @@ public static class AuthEndpoints
             [
                 new Claim(ClaimTypes.NameIdentifier, member.Id.ToString()),
                 new Claim(ClaimTypes.Name, member.Username),
-                new Claim(ClaimTypes.Role, member.Role.ToString())
+                new Claim(ClaimTypes.Role, RoleName(member.Role))
             ]),
             SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
         };
 
         return (new JsonWebTokenHandler().CreateToken(descriptor), expiresAt);
     }
-
-    private const string DummyHash =
-        "AQAAAAIAAYagAAAAELbcgxaLnGZ8h3sQKJyJx8pQEo0mCPGmC9pAPRs4bWQpCyGyDJmXeQVbxvOxaJmQpg==";
 }

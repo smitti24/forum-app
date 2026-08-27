@@ -23,7 +23,20 @@ public class RegistrationTests
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
         var body = await response.Content.ReadFromJsonAsync<JsonElement>();
-        Assert.Equal("asmith", body.GetProperty("username").GetString());
+        Assert.Equal("asmith", body.GetProperty("member").GetProperty("username").GetString());
+    }
+
+    [Fact]
+    public async Task Registration_signs_the_new_member_in()
+    {
+        using var factory = new ForumApiFactory();
+        var client = factory.CreateClient();
+
+        var response = await Register(client, "asmith@example.com", "asmith");
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>();
+
+        Assert.False(string.IsNullOrWhiteSpace(body.GetProperty("token").GetString()));
+        Assert.Equal("member", body.GetProperty("member").GetProperty("role").GetString());
     }
 
     [Fact]

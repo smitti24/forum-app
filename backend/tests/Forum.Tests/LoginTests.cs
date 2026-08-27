@@ -46,7 +46,7 @@ public class LoginTests
         var expected = await factory.WithDbAsync(db => db.Members.Select(m => m.Id).SingleAsync());
 
         Assert.Equal(expected.ToString(), id);
-        Assert.Equal("Member", role);
+        Assert.Equal("member", role);
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class LoginTests
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("asmith@example.com", body.GetProperty("email").GetString());
-        Assert.Equal("Member", body.GetProperty("role").GetString());
+        Assert.Equal("member", body.GetProperty("role").GetString());
     }
 
     [Fact]
