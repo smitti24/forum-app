@@ -65,6 +65,11 @@ using (var scope = app.Services.CreateScope())
     await db.Database.ExecuteSqlRawAsync("PRAGMA journal_mode=WAL;");
 }
 
+if (app.Environment.IsDevelopment() && app.Configuration.GetValue("Seed", true))
+{
+    await app.Services.SeedAsync();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

@@ -23,11 +23,14 @@ public class ForumApiFactory : WebApplicationFactory<Program>
 
     protected virtual int CredentialAttemptsPerMinute => 10_000;
 
+    protected virtual bool Seed => false;
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
         builder.UseSetting("ConnectionStrings:Forum", _connectionString);
         builder.UseSetting("RateLimiting:CredentialAttemptsPerMinute", CredentialAttemptsPerMinute.ToString());
+        builder.UseSetting("Seed", Seed.ToString());
     }
 
     public async Task<string> RegisterModeratorAndLoginAsync(
