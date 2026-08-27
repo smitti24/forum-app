@@ -1,3 +1,5 @@
+using System.Net.Http.Json;
+using System.Text.Json;
 using Forum.Api.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -19,10 +21,36 @@ public class ForumApiFactory : WebApplicationFactory<Program>
         _keepAlive.Open();
     }
 
+    protected virtual int CredentialAttemptsPerMinute => 10_000;
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
         builder.UseSetting("ConnectionStrings:Forum", _connectionString);
+        builder.UseSetting("RateLimiting:CredentialAttemptsPerMinute", CredentialAttemptsPerMinute.ToString());
+    }
+
+    public async Task<string> RegisterAndLoginAsync(
+        HttpClient client,
+        string username,
+        string password = "a-long-enough-password")
+    {
+        await client.PostAsJsonAsync("/api/v1/auth/register", new
+        {
+            email = $"{username}@example.com",
+            username,
+            password
+        });
+
+        var response = await client.PostAsJsonAsync("/api/v1/auth/login", new
+        {
+            identifier = username,
+            password
+        });
+
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>();
+
+        return body.GetProperty("accessToken").GetString()!;
     }
 
     public async Task<T> WithDbAsync<T>(Func<ForumDbContext, Task<T>> work)
