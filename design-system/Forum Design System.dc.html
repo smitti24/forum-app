@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+  :root {
+    --nb-border: #000000;
+    --nb-shadow: #000000;
+    --nb-radius: 0rem;
+    --nb-shadow-offset-x: 4px;
+    --nb-shadow-offset-y: 4px;
+    --nb-foreground: #000000;
+    --nb-background: #ffffff;
+    --nb-field-bg: #faf3d6;
+    --nb-primary: #ff90e8;
+    --nb-secondary: #c8a2ff;
+    --nb-accent: #8ae9ff;
+    --nb-danger: #ff4f8a;
+    --nb-success: #63e6be;
+    --nb-warning: #ff9c42;
+    --nb-main: oklch(90% 0.15 95);
+    --nb-surface: #ffffff;
+    --nb-secondary-background: oklch(96% 0 0);
+    --nb-border-width: 2px;
+    --nb-font-sans: system-ui, sans-serif;
+    --nb-font-mono: ui-monospace, SFMono-Regular, monospace;
+    --nb-font-weight-normal: 500;
+    --nb-font-weight-bold: 700;
+  }
+  body {
+    margin: 0;
+    background: var(--nb-secondary-background);
+    color: var(--nb-foreground);
+    font-family: var(--nb-font-sans);
+    font-weight: var(--nb-font-weight-normal);
+  }
+  a { color: var(--nb-foreground); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  a:hover { background: var(--nb-main); }
+  *:focus-visible { outline: 3px solid var(--nb-foreground); outline-offset: 2px; }
+  @keyframes nbshimmer { 0% { opacity: 1 } 50% { opacity: .4 } 100% { opacity: 1 } }
+</style>
+</helmet>
+
+<div style="max-width: 1180px; margin: 0 auto; padding: clamp(20px, 5vw, 56px) clamp(16px, 4vw, 40px) 120px;">
+
+  <header style="border: 2px solid #000; background: var(--nb-main); box-shadow: 8px 8px 0 #000; padding: clamp(20px, 5vw, 40px); margin-bottom: 72px;">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 20px;">
+      <span style="padding: 4px 10px; background: #000; color: var(--nb-main); font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;">ng-brutalism</span>
+      <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">forum kit v1</span>
+    </div>
+    <h1 style="margin: 0 0 18px; font-size: clamp(32px, 7vw, 58px); font-weight: 700; line-height: .98; letter-spacing: -0.03em; text-transform: uppercase; max-width: 20ch;">A loud kit for a working forum</h1>
+    <p style="margin: 0; max-width: 60ch; font-size: 16px; line-height: 1.55; font-weight: 500; text-wrap: pretty;">Hard 2px borders, 4px offset shadows, zero radius. Mobile-first at 390px. Every value is an <span style="font-family: var(--nb-font-mono); font-weight: 700;">--nb-*</span> custom property, so this sheet and your Angular components read one source.</p>
+  </header>
+
+  <section style="margin-bottom: 80px;">
+    <div style="display: inline-flex; align-items: center; gap: 10px; background: #000; color: #fff; padding: 6px 12px; margin-bottom: 28px;">
+      <span style="font-family: var(--nb-font-mono); font-size: 12px; font-weight: 700;">01</span>
+      <h2 style="margin: 0; font-size: 14px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">Tokens &amp; semantics</h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(158px, 1fr)); gap: 16px; margin-bottom: 40px;">
+      <div style="border: 2px solid #000; background: #fff; box-shadow: 4px 4px 0 #000;">
+        <div style="height: 66px; background: var(--nb-primary); border-bottom: 2px solid #000;"></div>
+        <div style="padding: 10px 12px;"><div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;">Primary</div><div style="font-family: var(--nb-font-mono); font-size: 11px; margin-top: 3px;">--nb-primary</div><div style="font-size: 11.5px; margin-top: 7px; line-height: 1.4;">Post, submit, liked heart</div></div>
+      </div>
+      <div style="border: 2px solid #000; background: #fff; box-shadow: 4px 4px 0 #000;">
+        <div style="height: 66px; background: var(--nb-secondary); border-bottom: 2px solid #000;"></div>
+        <div style="padding: 10px 12px;"><div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;">Secondary</div><div style="font-family: var(--nb-font-mono); font-size: 11px; margin-top: 3px;">--nb-secondary</div><div style="font-size: 11.5px; margin-top: 7px; line-height: 1.4;">Moderator badge, author chip</div></div>
+      </div>
+      <div style="border: 2px solid #000; background: #fff; box-shadow: 4px 4px 0 #000;">
+        <div style="height: 66px; background: var(--nb-accent); border-bottom: 2px solid #000;"></div>
+        <div style="padding: 10px 12px;"><div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;">Accent</div><div style="font-family: var(--nb-font-mono); font-size: 11px; margin-top: 3px;">--nb-accent</div><div style="font-size: 11.5px; margin-top: 7px; line-height: 1.4;">Active filter, selected tab</div></div>
+      </div>
+      <div style="border: 2px solid #000; background: #fff; box-shadow: 4px 4px 0 #000;">
+        <div style="height: 66px; background: var(--nb-warning); border-bottom: 2px solid #000;"></div>
+        <div style="padding: 10px 12px;"><div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;">Warning</div><div style="font-family: var(--nb-font-mono); font-size: 11px; margin-top: 3px;">--nb-warning</div><div style="font-size: 11.5px; margin-top: 7px; line-height: 1.4;">Misleading-info flag</div></div>
+      </div>
+      <div style="border: 2px solid #000; background: #fff; box-shadow: 4px 4px 0 #000;">
+        <div style="height: 66px; background: var(--nb-success); border-bottom: 2px solid #000;"></div>
+        <div style="padding: 10px 12px;"><div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;">Success</div><div style="font-family: var(--nb-font-mono); font-size: 11px; margin-top: 3px;">--nb-success</div><div style="font-size: 11.5px; margin-top: 7px; line-height: 1.4;">Answered, saved</div></div>
+      </div>
+      <div style="border: 2px solid #000; background: #fff; box-shadow: 4px 4px 0 #000;">
+        <div style="height: 66px; background: var(--nb-danger); border-bottom: 2px solid #000;"></div>
+        <div style="padding: 10px 12px;"><div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;">Danger</div><div style="font-family: var(--nb-font-mono); font-size: 11px; margin-top: 3px;">--nb-danger</div><div style="font-size: 11.5px; margin-top: 7px; line-height: 1.4;">Delete, validation error</div></div>
+      </div>
+      <div style="border: 2px solid #000; background: #fff; box-shadow: 4px 4px 0 #000;">
+        <div style="height: 66px; background: var(--nb-main); border-bottom: 2px solid #000;"></div>
+        <div style="padding: 10px 12px;"><div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;">Main</div><div style="font-family: var(--nb-font-mono); font-size: 11px; margin-top: 3px;">--nb-main</div><div style="font-size: 11.5px; margin-top: 7px; line-height: 1.4;">App bar, page headers</div></div>
+      </div>
+      <div style="border: 2px solid #000; background: #fff; box-shadow: 4px 4px 0 #000;">
+        <div style="height: 66px; background: var(--nb-field-bg); border-bottom: 2px solid #000;"></div>
+        <div style="padding: 10px 12px;"><div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;">Field</div><div style="font-family: var(--nb-font-mono); font-size: 11px; margin-top: 3px;">--nb-field-bg</div><div style="font-size: 11.5px; margin-top: 7px; line-height: 1.4;">Every input and textarea</div></div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px;">
+      <div>
+        <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 18px;">Type — system-ui, 500 / 700</div>
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; border-bottom: 2px solid #000; padding-bottom: 10px;"><span style="font-size: 30px; font-weight: 700; letter-spacing: -0.03em; text-transform: uppercase; line-height: 1;">Screen title</span><span style="font-family: var(--nb-font-mono); font-size: 11px; white-space: nowrap;">30/700</span></div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; border-bottom: 2px solid #000; padding-bottom: 10px;"><span style="font-size: 18px; font-weight: 700; letter-spacing: -0.01em;">Post title</span><span style="font-family: var(--nb-font-mono); font-size: 11px; white-space: nowrap;">18/700</span></div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; border-bottom: 2px solid #000; padding-bottom: 10px;"><span style="font-size: 15px; font-weight: 500;">Body and comments</span><span style="font-family: var(--nb-font-mono); font-size: 11px; white-space: nowrap;">15/500</span></div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; border-bottom: 2px solid #000; padding-bottom: 10px;"><span style="font-family: var(--nb-font-mono); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;">Meta · labels · counts</span><span style="font-family: var(--nb-font-mono); font-size: 11px; white-space: nowrap;">12/700</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 18px;">Border, shadow, press</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 22px;">
+          <div style="text-align: center;"><div style="width: 76px; height: 56px; background: #fff; border: 2px solid #000;"></div><div style="font-family: var(--nb-font-mono); font-size: 10.5px; margin-top: 8px;">flat</div></div>
+          <div style="text-align: center;"><div style="width: 76px; height: 56px; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000;"></div><div style="font-family: var(--nb-font-mono); font-size: 10.5px; margin-top: 8px;">default 4px</div></div>
+          <div style="text-align: center;"><div style="width: 76px; height: 56px; background: #fff; border: 3px solid #000; box-shadow: 8px 8px 0 #000;"></div><div style="font-family: var(--nb-font-mono); font-size: 10.5px; margin-top: 8px;">heavy 8px</div></div>
+          <div style="text-align: center;"><div style="width: 76px; height: 56px; background: #fff; border: 2px solid #000; box-shadow: -4px -4px 0 #000;"></div><div style="font-family: var(--nb-font-mono); font-size: 10.5px; margin-top: 8px;">reverse</div></div>
+        </div>
+        <div style="margin-top: 24px; padding: 14px; border: 2px solid #000; background: var(--nb-field-bg); font-size: 12.5px; line-height: 1.5;">Press moves the element by the shadow offset and drops the shadow — hold the button below to feel it. Radius stays <span style="font-family: var(--nb-font-mono); font-weight: 700;">0</span> everywhere.</div>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom: 80px;">
+    <div style="display: inline-flex; align-items: center; gap: 10px; background: #000; color: #fff; padding: 6px 12px; margin-bottom: 28px;">
+      <span style="font-family: var(--nb-font-mono); font-size: 12px; font-weight: 700;">02</span>
+      <h2 style="margin: 0; font-size: 14px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">Primitives</h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 32px; align-items: start;">
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">Buttons · 44px min</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 14px;">
+          <button style="height: 44px; padding: 0 18px; background: var(--nb-primary); color: #000; border: 2px solid #000; box-shadow: 4px 4px 0 #000; font-family: var(--nb-font-sans); font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer; transition: transform .08s, box-shadow .08s;" style-active="{ transform: 'translate(4px, 4px)', boxShadow: 'none' }">Post it</button>
+          <button style="height: 44px; padding: 0 18px; background: #fff; color: #000; border: 2px solid #000; box-shadow: 4px 4px 0 #000; font-family: var(--nb-font-sans); font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer; transition: transform .08s, box-shadow .08s;" style-active="{ transform: 'translate(4px, 4px)', boxShadow: 'none' }">Cancel</button>
+          <button style="height: 44px; padding: 0 18px; background: transparent; color: #000; border: 2px solid transparent; font-family: var(--nb-font-sans); font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;" style-hover="{ borderColor: '#000', background: '#fff' }">Ghost</button>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 14px;">
+          <button style="height: 44px; padding: 0 18px; background: var(--nb-primary); color: #000; border: 2px solid #000; box-shadow: 4px 4px 0 #000; font-family: var(--nb-font-sans); font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; opacity: .5; cursor: not-allowed;" disabled="disabled">Disabled</button>
+          <button style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; cursor: pointer; transition: transform .08s, box-shadow .08s;" style-active="{ transform: 'translate(4px, 4px)', boxShadow: 'none' }" aria-label="Bookmark"><i class="ph-bold ph-bookmark-simple" style="font-size: 19px;"></i></button>
+          <button style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; cursor: pointer; transition: transform .08s, box-shadow .08s;" style-active="{ transform: 'translate(4px, 4px)', boxShadow: 'none' }" aria-label="Share"><i class="ph-bold ph-share-network" style="font-size: 19px;"></i></button>
+          <button style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; cursor: pointer; transition: transform .08s, box-shadow .08s;" style-active="{ transform: 'translate(4px, 4px)', boxShadow: 'none' }" aria-label="More"><i class="ph-bold ph-dots-three" style="font-size: 19px;"></i></button>
+        </div>
+        <button style="width: 100%; height: 50px; background: var(--nb-main); color: #000; border: 2px solid #000; box-shadow: 4px 4px 0 #000; font-family: var(--nb-font-sans); font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; cursor: pointer; transition: transform .08s, box-shadow .08s;" style-active="{ transform: 'translate(4px, 4px)', boxShadow: 'none' }">Full width action</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">Chips &amp; badges</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <span style="padding: 5px 10px; border: 2px solid #000; background: var(--nb-accent); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;">Integration</span>
+          <span style="padding: 5px 10px; border: 2px solid #000; background: #fff; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;">Liveness SDK</span>
+          <span style="padding: 5px 10px; border: 2px solid #000; background: var(--nb-success); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;">Answered</span>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 2px solid #000; background: var(--nb-warning); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;"><i class="ph-fill ph-warning" style="font-size: 14px;"></i>Flagged</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 2px solid #000; background: var(--nb-secondary); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;"><i class="ph-fill ph-shield-check" style="font-size: 14px;"></i>Mod</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 2px solid #000; background: var(--nb-secondary-background); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;"><i class="ph-bold ph-eye-slash" style="font-size: 14px;"></i>Guest</span>
+        </div>
+        <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-top: 6px;">Avatars — square, bordered</div>
+        <div style="display: flex; align-items: flex-end; gap: 12px;">
+          <div style="width: 46px; height: 46px; border: 2px solid #000; background: var(--nb-primary); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700;">TM</div>
+          <div style="width: 38px; height: 38px; border: 2px solid #000; background: var(--nb-accent); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;">RK</div>
+          <div style="width: 30px; height: 30px; border: 2px solid #000; background: var(--nb-secondary); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">AN</div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">Fields</div>
+        <label style="display: flex; flex-direction: column; gap: 7px;">
+          <span style="font-family: var(--nb-font-mono); font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">Title</span>
+          <input type="text" placeholder="What's the question?" style="height: 46px; padding: 0 12px; background: var(--nb-field-bg); border: 2px solid #000; box-shadow: 4px 4px 0 #000; font-family: var(--nb-font-sans); font-size: 15px; font-weight: 500; color: #000;" />
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 7px;">
+          <span style="font-family: var(--nb-font-mono); font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">Body</span>
+          <textarea rows="3" placeholder="Add context, error text, or the request you sent." style="padding: 10px 12px; background: var(--nb-field-bg); border: 2px solid #000; box-shadow: 4px 4px 0 #000; font-family: var(--nb-font-sans); font-size: 15px; font-weight: 500; color: #000; resize: vertical;"></textarea>
+        </label>
+        <div>
+          <div style="font-family: var(--nb-font-mono); font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px;">Sort</div>
+          <div style="display: inline-flex; border: 2px solid #000; box-shadow: 4px 4px 0 #000; background: #fff; align-self: flex-start;">
+            <sc-for list="{{ sorts }}" as="opt" hint-placeholder-count="3">
+              <button onClick="{{ setSort }}" data-sort="{{ opt.key }}" style="{{ opt.style }}">{{ opt.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom: 80px;">
+    <div style="display: inline-flex; align-items: center; gap: 10px; background: #000; color: #fff; padding: 6px 12px; margin-bottom: 16px;">
+      <span style="font-family: var(--nb-font-mono); font-size: 12px; font-weight: 700;">03</span>
+      <h2 style="margin: 0; font-size: 14px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">The post card</h2>
+    </div>
+    <p style="margin: 0 0 32px; max-width: 62ch; font-size: 15px; line-height: 1.55;">Author header, then content, then a bordered action row. This card is the atom of the feed and of the detail page — only its density changes.</p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; align-items: start;">
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">Default · 390px</div>
+        <article style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000;">
+          <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 2px solid #000;">
+            <div style="width: 38px; height: 38px; flex: none; border: 2px solid #000; background: var(--nb-primary); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;">TM</div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 14px; font-weight: 700;">Thabo M.</div>
+              <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; margin-top: 2px;">Integration · 4h</div>
+            </div>
+            <button style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: #fff; border: 2px solid #000; cursor: pointer;" aria-label="More"><i class="ph-bold ph-dots-three" style="font-size: 16px;"></i></button>
+          </div>
+          <div style="padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+            <h3 style="margin: 0; font-size: 18px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em;">Liveness check times out on low-end Android before the second frame</h3>
+            <p style="margin: 0; font-size: 15px; line-height: 1.5; text-wrap: pretty;">Consistent on devices under 3GB RAM. The SDK returns TIMEOUT_CAPTURE after roughly six seconds. Raising the capture window helps but pushes us past our SLA.</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <span style="padding: 4px 8px; border: 2px solid #000; background: var(--nb-accent); font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase;">android</span>
+              <span style="padding: 4px 8px; border: 2px solid #000; background: #fff; font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase;">liveness</span>
+            </div>
+          </div>
+          <div style="display: flex; align-items: stretch; border-top: 2px solid #000;">
+            <button onClick="{{ toggleLike }}" style="{{ likeStyle }}">
+              <i class="{{ likeIcon }}" style="font-size: 18px;"></i>
+              <span style="font-variant-numeric: tabular-nums;">{{ likeCount }}</span>
+            </button>
+            <button style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 46px; background: #fff; border: none; border-right: 2px solid #000; font-family: var(--nb-font-sans); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;" style-hover="{ background: 'oklch(96% 0 0)' }"><i class="ph-bold ph-chat-circle" style="font-size: 18px;"></i>12</button>
+            <button style="width: 52px; display: inline-flex; align-items: center; justify-content: center; height: 46px; background: #fff; border: none; cursor: pointer;" style-hover="{ background: 'oklch(96% 0 0)' }" aria-label="Share"><i class="ph-bold ph-share-network" style="font-size: 18px;"></i></button>
+          </div>
+        </article>
+        <div style="font-size: 13px; line-height: 1.5;">Tap the heart. One like per user; the API rejects a like on your own post.</div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">Flagged by a moderator</div>
+        <article style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000;">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 9px 14px; background: var(--nb-warning); border-bottom: 2px solid #000;">
+            <i class="ph-fill ph-warning" style="font-size: 17px;"></i>
+            <span style="font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;">Flagged as misleading by @sipho</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 2px solid #000;">
+            <div style="width: 38px; height: 38px; flex: none; border: 2px solid #000; background: var(--nb-accent); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;">RK</div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 14px; font-weight: 700;">Riaan K.</div>
+              <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; margin-top: 2px;">Compliance · 2d</div>
+            </div>
+          </div>
+          <div style="padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+            <h3 style="margin: 0; font-size: 18px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em;">You can skip the liveness step entirely if the document scan passes</h3>
+            <p style="margin: 0; font-size: 15px; line-height: 1.5; text-wrap: pretty;">Flagged content stays readable — the banner says the moderators disagree, it doesn't hide the post or the thread under it.</p>
+          </div>
+          <div style="display: flex; align-items: stretch; border-top: 2px solid #000;">
+            <button style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 46px; background: #fff; border: none; border-right: 2px solid #000; font-family: var(--nb-font-sans); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;" style-hover="{ background: 'oklch(96% 0 0)' }"><i class="ph-bold ph-heart" style="font-size: 18px;"></i>3</button>
+            <button style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 46px; background: #fff; border: none; border-right: 2px solid #000; font-family: var(--nb-font-sans); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;" style-hover="{ background: 'oklch(96% 0 0)' }"><i class="ph-bold ph-chat-circle" style="font-size: 18px;"></i>31</button>
+            <button style="flex: 1; display: inline-flex; align-items: center; justify-content: center; height: 46px; background: var(--nb-secondary); border: none; font-family: var(--nb-font-sans); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;">Unflag</button>
+          </div>
+        </article>
+        <div style="font-size: 13px; line-height: 1.5;">Only moderators see the unflag action; everyone sees the banner.</div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">Like control · every state</div>
+        <div style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 14px; border-bottom: 2px solid #000;">
+            <button style="display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 14px; background: #fff; border: 2px solid #000; font-family: var(--nb-font-sans); font-size: 13px; font-weight: 700; cursor: pointer;"><i class="ph-bold ph-heart" style="font-size: 17px;"></i>24</button>
+            <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase;">Rest</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 14px; border-bottom: 2px solid #000;">
+            <button style="display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 14px; background: var(--nb-secondary-background); border: 2px solid #000; box-shadow: 3px 3px 0 #000; font-family: var(--nb-font-sans); font-size: 13px; font-weight: 700; cursor: pointer;"><i class="ph-bold ph-heart" style="font-size: 17px;"></i>24</button>
+            <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase;">Hover</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 14px; border-bottom: 2px solid #000;">
+            <button style="display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 14px; background: var(--nb-primary); border: 2px solid #000; font-family: var(--nb-font-sans); font-size: 13px; font-weight: 700; cursor: pointer;"><i class="ph-fill ph-heart" style="font-size: 17px;"></i>25</button>
+            <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase;">Liked</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 14px; border-bottom: 2px solid #000;">
+            <button style="display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 14px; background: #fff; border: 2px solid #000; font-family: var(--nb-font-sans); font-size: 13px; font-weight: 700; opacity: .45; cursor: not-allowed;" disabled="disabled"><i class="ph-bold ph-heart" style="font-size: 17px;"></i>24</button>
+            <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase;">Own post</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 14px;">
+            <button style="display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 14px; background: #fff; border: 2px dashed #000; font-family: var(--nb-font-sans); font-size: 12px; font-weight: 700; text-transform: uppercase; cursor: pointer;"><i class="ph-bold ph-heart" style="font-size: 17px;"></i>Sign in</button>
+            <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase;">Guest</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom: 80px;">
+    <div style="display: inline-flex; align-items: center; gap: 10px; background: #000; color: #fff; padding: 6px 12px; margin-bottom: 28px;">
+      <span style="font-family: var(--nb-font-mono); font-size: 12px; font-weight: 700;">04</span>
+      <h2 style="margin: 0; font-size: 14px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">Navigation, filters, threads</h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; align-items: start;">
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">App bar &amp; bottom tabs</div>
+        <div style="border: 2px solid #000; box-shadow: 4px 4px 0 #000; background: var(--nb-secondary-background);">
+          <div style="display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: var(--nb-main); border-bottom: 2px solid #000;">
+            <i class="ph-bold ph-list" style="font-size: 21px;"></i>
+            <span style="font-size: 16px; font-weight: 700; letter-spacing: -0.01em; text-transform: uppercase;">Forum</span>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+              <i class="ph-bold ph-magnifying-glass" style="font-size: 20px;"></i>
+              <div style="width: 30px; height: 30px; border: 2px solid #000; background: var(--nb-primary); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">TM</div>
+            </div>
+          </div>
+          <div style="height: 84px; display: flex; align-items: center; justify-content: center; font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">feed</div>
+          <div style="display: flex; background: #fff; border-top: 2px solid #000;">
+            <div style="flex: 1; height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; background: var(--nb-accent); border-right: 2px solid #000;"><i class="ph-fill ph-house" style="font-size: 19px;"></i><span style="font-family: var(--nb-font-mono); font-size: 9.5px; font-weight: 700; text-transform: uppercase;">Feed</span></div>
+            <div style="flex: 1; height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-right: 2px solid #000;"><i class="ph-bold ph-magnifying-glass" style="font-size: 19px;"></i><span style="font-family: var(--nb-font-mono); font-size: 9.5px; font-weight: 700; text-transform: uppercase;">Search</span></div>
+            <div style="flex: 1; height: 58px; display: flex; align-items: center; justify-content: center; border-right: 2px solid #000;"><div style="width: 40px; height: 40px; border: 2px solid #000; background: var(--nb-primary); box-shadow: 3px 3px 0 #000; display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-plus" style="font-size: 19px;"></i></div></div>
+            <div style="flex: 1; height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-right: 2px solid #000;"><i class="ph-bold ph-bell" style="font-size: 19px;"></i><span style="font-family: var(--nb-font-mono); font-size: 9.5px; font-weight: 700; text-transform: uppercase;">Alerts</span></div>
+            <div style="flex: 1; height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;"><i class="ph-bold ph-user" style="font-size: 19px;"></i><span style="font-family: var(--nb-font-mono); font-size: 9.5px; font-weight: 700; text-transform: uppercase;">You</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">Filter sheet</div>
+        <div style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000;">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; background: var(--nb-accent); border-bottom: 2px solid #000;">
+            <span style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;">Filter</span>
+            <button style="height: 30px; padding: 0 10px; background: #fff; border: 2px solid #000; font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer;">Reset</button>
+          </div>
+          <div style="padding: 14px; display: flex; flex-direction: column; gap: 18px;">
+            <label style="display: flex; flex-direction: column; gap: 7px;">
+              <span style="font-family: var(--nb-font-mono); font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">Keyword</span>
+              <input type="text" placeholder="Title or body" style="height: 44px; padding: 0 12px; background: var(--nb-field-bg); border: 2px solid #000; font-family: var(--nb-font-sans); font-size: 15px; font-weight: 500; color: #000;" />
+            </label>
+            <div>
+              <div style="font-family: var(--nb-font-mono); font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 9px;">Category</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <sc-for list="{{ chips }}" as="chip" hint-placeholder-count="5">
+                  <button onClick="{{ toggleChip }}" data-chip="{{ chip.label }}" style="{{ chip.style }}">{{ chip.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+            <label style="display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; font-weight: 700; cursor: pointer;">
+              <input type="checkbox" style="width: 20px; height: 20px; accent-color: #000;" />
+              Hide flagged posts
+            </label>
+            <button style="width: 100%; height: 46px; background: var(--nb-primary); border: 2px solid #000; box-shadow: 4px 4px 0 #000; font-family: var(--nb-font-sans); font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; cursor: pointer; transition: transform .08s, box-shadow .08s;" style-active="{ transform: 'translate(4px, 4px)', boxShadow: 'none' }">Apply</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">Comment thread</div>
+        <div style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000;">
+          <div style="padding: 14px; border-bottom: 2px solid #000; display: flex; gap: 10px;">
+            <div style="width: 30px; height: 30px; flex: none; border: 2px solid #000; background: var(--nb-secondary); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">AN</div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px;">
+              <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;">Anele N. · 3h</div>
+              <div style="font-size: 15px; line-height: 1.5;">We hit this too. Bumping the capture window to 9s cleared it, but only after we moved the frame buffer off the main thread.</div>
+              <div style="display: flex; gap: 8px;">
+                <button style="display: inline-flex; align-items: center; gap: 5px; height: 34px; padding: 0 10px; background: #fff; border: 2px solid #000; font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer;"><i class="ph-bold ph-heart" style="font-size: 14px;"></i>8</button>
+                <button style="height: 34px; padding: 0 10px; background: #fff; border: 2px solid #000; font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer;">Reply</button>
+              </div>
+            </div>
+          </div>
+          <div style="padding: 14px 14px 14px 34px; border-bottom: 2px solid #000; display: flex; gap: 10px; background: var(--nb-secondary-background);">
+            <div style="width: 30px; height: 30px; flex: none; border: 2px solid #000; background: var(--nb-primary); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">TM</div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;">Thabo M. · 2h</span>
+                <span style="padding: 2px 6px; border: 2px solid #000; background: var(--nb-secondary); font-family: var(--nb-font-mono); font-size: 9.5px; font-weight: 700; text-transform: uppercase;">author</span>
+              </div>
+              <div style="font-size: 15px; line-height: 1.5;">Off-thread buffer did it. Thanks.</div>
+              <div style="display: flex; gap: 8px;">
+                <button style="display: inline-flex; align-items: center; gap: 5px; height: 34px; padding: 0 10px; background: #fff; border: 2px solid #000; font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; opacity: .45; cursor: not-allowed;" disabled="disabled"><i class="ph-bold ph-heart" style="font-size: 14px;"></i>2</button>
+                <button style="height: 34px; padding: 0 10px; background: #fff; border: 2px solid #000; font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer;">Reply</button>
+              </div>
+            </div>
+          </div>
+          <div style="padding: 14px; display: flex; gap: 10px;">
+            <input type="text" placeholder="Add a comment" style="flex: 1; min-width: 0; height: 44px; padding: 0 12px; background: var(--nb-field-bg); border: 2px solid #000; font-family: var(--nb-font-sans); font-size: 15px; font-weight: 500; color: #000;" />
+            <button style="width: 48px; height: 44px; flex: none; display: inline-flex; align-items: center; justify-content: center; background: var(--nb-primary); border: 2px solid #000; cursor: pointer;" aria-label="Send"><i class="ph-bold ph-paper-plane-right" style="font-size: 18px;"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom: 80px;">
+    <div style="display: inline-flex; align-items: center; gap: 10px; background: #000; color: #fff; padding: 6px 12px; margin-bottom: 28px;">
+      <span style="font-family: var(--nb-font-mono); font-size: 12px; font-weight: 700;">05</span>
+      <h2 style="margin: 0; font-size: 14px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">Feedback states</h2>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(255px, 1fr)); gap: 20px;">
+      <div style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; padding: 22px 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px;">
+        <div style="width: 44px; height: 44px; border: 2px solid #000; background: var(--nb-accent); display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-chats-circle" style="font-size: 22px;"></i></div>
+        <div style="font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: .02em;">Nothing here</div>
+        <div style="font-size: 14px; line-height: 1.5;">No posts match this filter. Widen the category or clear the keyword.</div>
+        <button style="height: 40px; padding: 0 14px; background: #fff; border: 2px solid #000; box-shadow: 3px 3px 0 #000; font-family: var(--nb-font-sans); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;">Clear filters</button>
+      </div>
+      <div style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <div style="width: 38px; height: 38px; border: 2px solid #000; background: var(--nb-secondary-background); animation: nbshimmer 1.3s ease-in-out infinite;"></div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+            <div style="height: 12px; width: 46%; border: 2px solid #000; background: var(--nb-secondary-background); animation: nbshimmer 1.3s ease-in-out .1s infinite;"></div>
+            <div style="height: 10px; width: 28%; border: 2px solid #000; background: var(--nb-secondary-background); animation: nbshimmer 1.3s ease-in-out .2s infinite;"></div>
+          </div>
+        </div>
+        <div style="height: 14px; width: 90%; border: 2px solid #000; background: var(--nb-secondary-background); animation: nbshimmer 1.3s ease-in-out .15s infinite;"></div>
+        <div style="height: 12px; width: 100%; border: 2px solid #000; background: var(--nb-secondary-background); animation: nbshimmer 1.3s ease-in-out .25s infinite;"></div>
+        <div style="height: 12px; width: 64%; border: 2px solid #000; background: var(--nb-secondary-background); animation: nbshimmer 1.3s ease-in-out .35s infinite;"></div>
+        <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-top: 2px;">Skeleton — never a spinner</div>
+      </div>
+      <div style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; padding: 22px 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px;">
+        <div style="width: 44px; height: 44px; border: 2px solid #000; background: var(--nb-danger); display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-cloud-slash" style="font-size: 22px;"></i></div>
+        <div style="font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: .02em;">Feed failed</div>
+        <div style="font-size: 14px; line-height: 1.5;">The request came back 503. Your draft is saved locally.</div>
+        <button style="height: 40px; padding: 0 14px; background: var(--nb-primary); border: 2px solid #000; box-shadow: 3px 3px 0 #000; font-family: var(--nb-font-sans); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;">Try again</button>
+      </div>
+      <div style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column;">
+        <div style="display: flex; gap: 9px; align-items: flex-start; padding: 12px 14px; background: var(--nb-warning); border-bottom: 2px solid #000;">
+          <i class="ph-fill ph-warning" style="font-size: 17px; flex: none; margin-top: 1px;"></i>
+          <div style="font-size: 13.5px; font-weight: 700; line-height: 1.45;">You've already liked this post. One like per person.</div>
+        </div>
+        <div style="padding: 14px; display: flex; flex-direction: column; gap: 7px;">
+          <span style="font-family: var(--nb-font-mono); font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">Title — required</span>
+          <input type="text" value="" style="height: 44px; padding: 0 12px; background: var(--nb-field-bg); border: 3px solid var(--nb-danger); font-family: var(--nb-font-sans); font-size: 15px; font-weight: 500; color: #000;" />
+          <span style="font-size: 13px; font-weight: 700;">Give the post a title before publishing.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <sc-if value="{{ showAngularNotes }}" hint-placeholder-val="{{ true }}">
+    <section>
+      <div style="display: inline-flex; align-items: center; gap: 10px; background: #000; color: #fff; padding: 6px 12px; margin-bottom: 16px;">
+        <span style="font-family: var(--nb-font-mono); font-size: 12px; font-weight: 700;">06</span>
+        <h2 style="margin: 0; font-size: 14px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">Wiring it into Angular</h2>
+      </div>
+      <p style="margin: 0 0 24px; max-width: 62ch; font-size: 15px; line-height: 1.55;">ng-brutalism ships the primitives; this sheet decides what each colour means in a forum. Install it, then override only the semantic tokens.</p>
+
+      <div style="background: #000; border: 2px solid #000; box-shadow: 4px 4px 0 #000; overflow-x: auto; margin-bottom: 32px;">
+        <div style="padding: 8px 14px; background: var(--nb-main); border-bottom: 2px solid #000; font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">src/styles.css</div>
+        <pre style="margin: 0; padding: 16px; font-family: var(--nb-font-mono); font-size: 12.5px; line-height: 1.75; color: #fff;">@import "tailwindcss";
+@import "@ng-brutalism/ui/styles.css";
+
+/* Forum semantics — the only overrides we need */
+:root {
+  --nb-primary: #ff90e8;   /* post, submit, liked */
+  --nb-secondary: #c8a2ff; /* moderator, author */
+  --nb-accent: #8ae9ff;    /* active filter, tab */
+  --nb-warning: #ff9c42;   /* misleading-info flag */
+  --nb-success: #63e6be;   /* answered */
+  --nb-danger: #ff4f8a;    /* delete, field error */
+  --nb-radius: 0rem;
+  --nb-border-width: 2px;
+}</pre>
+      </div>
+
+      <div style="background: #000; border: 2px solid #000; box-shadow: 4px 4px 0 #000; overflow-x: auto; margin-bottom: 32px;">
+        <div style="padding: 8px 14px; background: var(--nb-accent); border-bottom: 2px solid #000; font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">post-card.component.html</div>
+        <pre style="margin: 0; padding: 16px; font-family: var(--nb-font-mono); font-size: 12.5px; line-height: 1.75; color: #fff;">&lt;article nbSurface shadow="default"&gt;
+  &lt;div nbCluster align="center" gap="sm"&gt;
+    &lt;app-avatar [user]="post().author" /&gt;
+    &lt;div nbStack gap="none"&gt;
+      &lt;span nbText weight="bold"&gt;{{ authorHole }}&lt;/span&gt;
+      &lt;span nbText size="xs" variant="mono"&gt;{{ metaHole }}&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;nb-callout *ngIf="post().isFlagged" tone="warning"&gt;
+    Flagged as misleading by {{ flaggerHole }}
+  &lt;/nb-callout&gt;
+
+  &lt;div nbStack gap="sm"&gt;
+    &lt;h3 nbText size="lg" weight="bold"&gt;{{ titleHole }}&lt;/h3&gt;
+    &lt;p nbText&gt;{{ excerptHole }}&lt;/p&gt;
+    &lt;nb-chip-group&gt;
+      &lt;nb-chip *ngFor="let t of post().tags" tone="accent"&gt;{{ tagHole }}&lt;/nb-chip&gt;
+    &lt;/nb-chip-group&gt;
+  &lt;/div&gt;
+
+  &lt;div nbSplit&gt;
+    &lt;app-like-button [post]="post()" /&gt;
+    &lt;button nbButton tone="background" size="sm"&gt;
+      {{ commentCountHole }} comments
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/article&gt;</pre>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+        <div style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; padding: 16px;">
+          <div style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px;">Yours to build</div>
+          <div style="font-size: 14px; line-height: 1.55;">Six components carry the app: <span style="font-family: var(--nb-font-mono); font-weight: 700;">PostCard, LikeButton, CommentItem, FilterSheet, BottomNav, AppShell</span>. Compose each from nb primitives — don't restyle them.</div>
+        </div>
+        <div style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; padding: 16px;">
+          <div style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px;">Theirs to provide</div>
+          <div style="font-size: 14px; line-height: 1.55;"><span style="font-family: var(--nb-font-mono); font-weight: 700;">nbSurface, nbSection, nbStack, nbCluster, nbSplit, nbButton, nbIconButton, nbChip, nbCallout, nbBadge, nbInput, nbTextarea, nbSelect, nbAvatarGroup, nbStatusDot</span> cover everything above.</div>
+        </div>
+        <div style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; padding: 16px;">
+          <div style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px;">One breakpoint</div>
+          <div style="font-size: 14px; line-height: 1.55;">At <span style="font-family: var(--nb-font-mono); font-weight: 700;">md</span> (768px) bottom tabs become a left rail and the feed gains a sidebar. Cards are identical at both widths. Below it: single column, 44px minimum tap targets.</div>
+        </div>
+        <div style="background: var(--nb-field-bg); border: 2px solid #000; box-shadow: 4px 4px 0 #000; padding: 16px;">
+          <div style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px;">Requirements</div>
+          <div style="font-size: 14px; line-height: 1.55;">Angular 21, Tailwind v4, Node 20.19+. Earlier Angular versions are not supported. Install with <span style="font-family: var(--nb-font-mono); font-weight: 700;">ng add @ng-brutalism/ui</span>.</div>
+        </div>
+      </div>
+    </section>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showAngularNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sheet sections&quot;}}">
+class Component extends DCLogic {
+  state = { sort: "new", liked: false, chips: { Integration: true } };
+
+  renderVals() {
+    const seg = (on) =>
+      `height:42px;padding:0 14px;background:${on ? "var(--nb-accent)" : "#fff"};color:#000;border:none;border-right:2px solid #000;font-family:var(--nb-font-sans);font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;`;
+
+    const sorts = [
+      { key: "new", label: "New" },
+      { key: "top", label: "Top" },
+      { key: "open", label: "Unanswered" }
+    ].map((o, i, arr) => ({
+      ...o,
+      style: seg(this.state.sort === o.key) + (i === arr.length - 1 ? "border-right:none;" : "")
+    }));
+
+    const chips = ["Integration", "Compliance", "Webhooks", "SDK", "Billing"].map(label => {
+      const on = !!this.state.chips[label];
+      return {
+        label,
+        style: `height:36px;padding:0 12px;background:${on ? "var(--nb-accent)" : "#fff"};color:#000;border:2px solid #000;${on ? "box-shadow:3px 3px 0 #000;" : ""}font-family:var(--nb-font-sans);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;`
+      };
+    });
+
+    const liked = this.state.liked;
+    return {
+      sorts,
+      chips,
+      likeCount: liked ? 25 : 24,
+      likeIcon: liked ? "ph-fill ph-heart" : "ph-bold ph-heart",
+      likeStyle:
+        `flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;height:46px;background:${liked ? "var(--nb-primary)" : "#fff"};` +
+        `border:none;border-right:2px solid #000;font-family:var(--nb-font-sans);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;`,
+      authorHole: "{{ post().author.name }}",
+      metaHole: "{{ post().category }} · {{ post().createdAt | timeAgo }}",
+      flaggerHole: "{{ post().flaggedBy }}",
+      titleHole: "{{ post().title }}",
+      excerptHole: "{{ post().excerpt }}",
+      tagHole: "{{ t }}",
+      commentCountHole: "{{ post().commentCount }}",
+      setSort: e => this.setState({ sort: e.currentTarget.dataset.sort }),
+      toggleChip: e => {
+        const k = e.currentTarget.dataset.chip;
+        this.setState(s => ({ chips: { ...s.chips, [k]: !s.chips[k] } }));
+      },
+      toggleLike: () => this.setState(s => ({ liked: !s.liked }))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+# The assessment brief itself is iiDENTIFii's document — not ours to publish.
+*.docx.pdf
+
+# .NET
+.vs/
+bin/
+obj/
+*.user
+*.suo
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+*.log
+
+# The local development database is a runtime artefact. The seeded database that ships
+# with the submission is a separate, deliberately committed file.
+backend/src/Forum.Api/forum.db*
+
+# Local config and secrets
+appsettings.Development.local.json
+appsettings.*.local.json
+.env
+.env.*
+*.pfx
+
+# Agent tooling — not part of the submission
+.claude/settings.local.json
+
+# OS
+Thumbs.db
+.DS_Store

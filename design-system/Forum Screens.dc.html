@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<style>
+  :root {
+    --nb-border: #000000;
+    --nb-shadow: #000000;
+    --nb-radius: 0rem;
+    --nb-foreground: #000000;
+    --nb-background: #ffffff;
+    --nb-field-bg: #faf3d6;
+    --nb-primary: #ff90e8;
+    --nb-secondary: #c8a2ff;
+    --nb-accent: #8ae9ff;
+    --nb-danger: #ff4f8a;
+    --nb-success: #63e6be;
+    --nb-warning: #ff9c42;
+    --nb-main: oklch(90% 0.15 95);
+    --nb-surface: #ffffff;
+    --nb-secondary-background: oklch(96% 0 0);
+    --nb-border-width: 2px;
+    --nb-font-sans: system-ui, sans-serif;
+    --nb-font-mono: ui-monospace, SFMono-Regular, monospace;
+  }
+  body { margin: 0; background: var(--nb-secondary-background); color: #000; font-family: var(--nb-font-sans); font-weight: 500; }
+  a { color: #000; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  a:hover { background: var(--nb-main); }
+  *:focus-visible { outline: 3px solid #000; outline-offset: 2px; }
+  button { font-family: var(--nb-font-sans); }
+  input, textarea, select { font-family: var(--nb-font-sans); color: #000; }
+  @keyframes nbshimmer { 0% { opacity: 1 } 50% { opacity: .4 } 100% { opacity: 1 } }
+</style>
+</helmet>
+
+<div style="max-width: 1180px; margin: 0 auto; padding: clamp(20px, 5vw, 56px) clamp(16px, 4vw, 40px) 120px;">
+
+  <header style="border: 2px solid #000; background: var(--nb-main); box-shadow: 8px 8px 0 #000; padding: clamp(20px, 5vw, 36px); margin-bottom: 48px;">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 18px;">
+      <span style="padding: 4px 10px; background: #000; color: var(--nb-main); font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;">ng-brutalism</span>
+      <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">wired demo · 390px</span>
+    </div>
+    <h1 style="margin: 0 0 16px; font-size: clamp(30px, 6.5vw, 52px); font-weight: 700; line-height: 1; letter-spacing: -0.03em; text-transform: uppercase; max-width: 22ch;">The forum, actually working</h1>
+    <p style="margin: 0; max-width: 62ch; font-size: 16px; line-height: 1.55; text-wrap: pretty;">Every screen from the assessment, running on the kit. Sign in, post, like, comment, filter, flag. State is real — likes are one per person, self-likes are refused, and only moderators can flag.</p>
+  </header>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 44px; align-items: flex-start;">
+
+    <div style="flex: none; width: 390px; max-width: 100%;">
+      <div style="border: 3px solid #000; box-shadow: 10px 10px 0 #000; background: var(--nb-secondary-background); height: 812px; display: flex; flex-direction: column; overflow: hidden;">
+
+        <div style="flex: none; display: flex; align-items: center; gap: 10px; height: 54px; padding: 0 12px; background: var(--nb-main); border-bottom: 2px solid #000;">
+          <button onClick="{{ barAction }}" style="width: 34px; height: 34px; flex: none; display: inline-flex; align-items: center; justify-content: center; background: #fff; border: 2px solid #000; cursor: pointer;" aria-label="Back or menu"><i class="{{ barIcon }}" style="font-size: 18px;"></i></button>
+          <span style="font-size: 15px; font-weight: 700; letter-spacing: -0.01em; text-transform: uppercase;">{{ barTitle }}</span>
+          <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+            <sc-if value="{{ showFilterBtn }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ openSheet }}" style="height: 34px; padding: 0 10px; display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 2px solid #000; font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer;"><i class="ph-bold ph-sliders-horizontal" style="font-size: 15px;"></i>{{ filterLabel }}</button>
+            </sc-if>
+            <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ true }}">
+              <div style="{{ myAvatarStyle }}">{{ myInitials }}</div>
+            </sc-if>
+          </div>
+        </div>
+
+        <div style="flex: 1; min-height: 0; overflow-y: auto; position: relative;">
+
+          <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Login" style="padding: 24px 16px; display: flex; flex-direction: column; gap: 18px;">
+              <div style="border: 2px solid #000; background: var(--nb-primary); box-shadow: 4px 4px 0 #000; padding: 18px;">
+                <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px;">iiDENTIFii</div>
+                <div style="font-size: 26px; font-weight: 700; line-height: 1; letter-spacing: -0.02em; text-transform: uppercase;">{{ authHeading }}</div>
+              </div>
+              <sc-if value="{{ isRegister }}" hint-placeholder-val="{{ false }}">
+                <label style="display: flex; flex-direction: column; gap: 7px;">
+                  <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">Display name</span>
+                  <input type="text" placeholder="Thabo M." style="height: 46px; padding: 0 12px; background: var(--nb-field-bg); border: 2px solid #000; font-size: 15px; font-weight: 500;" />
+                </label>
+              </sc-if>
+              <label style="display: flex; flex-direction: column; gap: 7px;">
+                <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">Email</span>
+                <input type="email" value="thabo@iidentifii.com" style="height: 46px; padding: 0 12px; background: var(--nb-field-bg); border: 2px solid #000; font-size: 15px; font-weight: 500;" readOnly="{{ true }}" />
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 7px;">
+                <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">Password</span>
+                <input type="password" value="demo-password" style="height: 46px; padding: 0 12px; background: var(--nb-field-bg); border: 2px solid #000; font-size: 15px; font-weight: 500;" readOnly="{{ true }}" />
+              </label>
+              <button onClick="{{ signInUser }}" style="height: 50px; background: var(--nb-primary); border: 2px solid #000; box-shadow: 4px 4px 0 #000; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; cursor: pointer; transition: transform .08s, box-shadow .08s;" style-active="{ transform: 'translate(4px, 4px)', boxShadow: 'none' }">{{ authCta }}</button>
+              <button onClick="{{ signInMod }}" style="height: 46px; background: var(--nb-secondary); border: 2px solid #000; box-shadow: 4px 4px 0 #000; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer; transition: transform .08s, box-shadow .08s;" style-active="{ transform: 'translate(4px, 4px)', boxShadow: 'none' }">Sign in as moderator</button>
+              <div style="height: 2px; background: #000;"></div>
+              <button onClick="{{ browseGuest }}" style="height: 46px; background: #fff; border: 2px dashed #000; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;">Browse without an account</button>
+              <button onClick="{{ toggleRegister }}" style="background: none; border: none; padding: 6px 0; font-size: 13px; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; cursor: pointer;">{{ authSwitch }}</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isFeed }}" hint-placeholder-val="{{ true }}">
+            <div data-screen-label="Feed" style="padding: 14px 14px 20px; display: flex; flex-direction: column; gap: 14px;">
+              <div style="display: flex; border: 2px solid #000; background: #fff; box-shadow: 4px 4px 0 #000;">
+                <sc-for list="{{ sorts }}" as="opt" hint-placeholder-count="3">
+                  <button onClick="{{ setSort }}" data-sort="{{ opt.key }}" style="{{ opt.style }}">{{ opt.label }}</button>
+                </sc-for>
+              </div>
+
+              <sc-if value="{{ guestNotice }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; align-items: center; gap: 9px; padding: 11px 12px; border: 2px solid #000; background: var(--nb-secondary-background); box-shadow: 4px 4px 0 #000;">
+                  <i class="ph-bold ph-eye-slash" style="font-size: 17px; flex: none;"></i>
+                  <span style="font-size: 13px; font-weight: 700; line-height: 1.4;">Reading as a guest. Sign in to like or post.</span>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}">
+                <div data-screen-label="Feed loading" style="display: flex; flex-direction: column; gap: 14px;">
+                  <sc-for list="{{ skeletons }}" as="sk" hint-placeholder-count="3">
+                    <div style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+                      <div style="display: flex; gap: 10px; align-items: center;">
+                        <div style="width: 38px; height: 38px; border: 2px solid #000; background: var(--nb-secondary-background); animation: nbshimmer 1.3s ease-in-out infinite;"></div>
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                          <div style="height: 12px; width: 46%; border: 2px solid #000; background: var(--nb-secondary-background); animation: nbshimmer 1.3s ease-in-out .1s infinite;"></div>
+                          <div style="height: 10px; width: 28%; border: 2px solid #000; background: var(--nb-secondary-background); animation: nbshimmer 1.3s ease-in-out .2s infinite;"></div>
+                        </div>
+                      </div>
+                      <div style="height: 14px; width: 88%; border: 2px solid #000; background: var(--nb-secondary-background); animation: nbshimmer 1.3s ease-in-out .15s infinite;"></div>
+                      <div style="height: 12px; width: 100%; border: 2px solid #000; background: var(--nb-secondary-background); animation: nbshimmer 1.3s ease-in-out .25s infinite;"></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isError }}" hint-placeholder-val="{{ false }}">
+                <div data-screen-label="Feed error" style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; padding: 22px 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px;">
+                  <div style="width: 44px; height: 44px; border: 2px solid #000; background: var(--nb-danger); display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-cloud-slash" style="font-size: 22px;"></i></div>
+                  <div style="font-size: 17px; font-weight: 700; text-transform: uppercase;">Feed failed</div>
+                  <div style="font-size: 14px; line-height: 1.5;">The request came back 503. Nothing you wrote was lost.</div>
+                  <button onClick="{{ reload }}" style="height: 42px; padding: 0 14px; background: var(--nb-primary); border: 2px solid #000; box-shadow: 3px 3px 0 #000; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;">Try again</button>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+                <div data-screen-label="Feed empty" style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; padding: 22px 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px;">
+                  <div style="width: 44px; height: 44px; border: 2px solid #000; background: var(--nb-accent); display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-chats-circle" style="font-size: 22px;"></i></div>
+                  <div style="font-size: 17px; font-weight: 700; text-transform: uppercase;">Nothing here</div>
+                  <div style="font-size: 14px; line-height: 1.5;">No posts match this filter. Widen the category or clear the keyword.</div>
+                  <button onClick="{{ clearFilters }}" style="height: 42px; padding: 0 14px; background: #fff; border: 2px solid #000; box-shadow: 3px 3px 0 #000; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;">Clear filters</button>
+                </div>
+              </sc-if>
+
+              <sc-for list="{{ feed }}" as="p" hint-placeholder-count="3">
+                <article style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000;">
+                  <sc-if value="{{ p.flagged }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 9px 12px; background: var(--nb-warning); border-bottom: 2px solid #000;">
+                      <i class="ph-fill ph-warning" style="font-size: 16px; flex: none;"></i>
+                      <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;">{{ p.flagText }}</span>
+                    </div>
+                  </sc-if>
+                  <div style="display: flex; align-items: center; gap: 10px; padding: 12px; border-bottom: 2px solid #000;">
+                    <div style="{{ p.avatarStyle }}">{{ p.initials }}</div>
+                    <div style="flex: 1; min-width: 0;">
+                      <div style="font-size: 14px; font-weight: 700;">{{ p.author }}</div>
+                      <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; margin-top: 2px;">{{ p.meta }}</div>
+                    </div>
+                    <sc-if value="{{ p.mine }}" hint-placeholder-val="{{ false }}">
+                      <span style="padding: 3px 7px; border: 2px solid #000; background: var(--nb-secondary); font-family: var(--nb-font-mono); font-size: 9.5px; font-weight: 700; text-transform: uppercase;">You</span>
+                    </sc-if>
+                  </div>
+                  <div onClick="{{ openPost }}" data-id="{{ p.id }}" style="padding: 12px; display: flex; flex-direction: column; gap: 10px; cursor: pointer;">
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em;">{{ p.title }}</h3>
+                    <p style="margin: 0; font-size: 15px; line-height: 1.5; text-wrap: pretty;">{{ p.excerpt }}</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 7px;">
+                      <sc-for list="{{ p.tags }}" as="t" hint-placeholder-count="2">
+                        <span style="{{ t.style }}">{{ t.label }}</span>
+                      </sc-for>
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: stretch; border-top: 2px solid #000;">
+                    <button onClick="{{ like }}" data-id="{{ p.id }}" style="{{ p.likeStyle }}"><i class="{{ p.likeIcon }}" style="font-size: 18px;"></i><span style="font-variant-numeric: tabular-nums;">{{ p.likes }}</span></button>
+                    <button onClick="{{ openPost }}" data-id="{{ p.id }}" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 46px; background: #fff; border: none; border-right: 2px solid #000; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;"><i class="ph-bold ph-chat-circle" style="font-size: 18px;"></i>{{ p.commentCount }}</button>
+                    <button style="width: 50px; display: inline-flex; align-items: center; justify-content: center; height: 46px; background: #fff; border: none; cursor: pointer;" aria-label="Share"><i class="ph-bold ph-share-network" style="font-size: 18px;"></i></button>
+                  </div>
+                </article>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Post detail" style="padding: 14px 14px 20px; display: flex; flex-direction: column; gap: 14px;">
+              <article style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000;">
+                <sc-if value="{{ post.flagged }}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--nb-warning); border-bottom: 2px solid #000;">
+                    <i class="ph-fill ph-warning" style="font-size: 16px; flex: none;"></i>
+                    <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;">{{ post.flagText }}</span>
+                  </div>
+                </sc-if>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px; border-bottom: 2px solid #000;">
+                  <div style="{{ post.avatarStyle }}">{{ post.initials }}</div>
+                  <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 14px; font-weight: 700;">{{ post.author }}</div>
+                    <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; margin-top: 2px;">{{ post.meta }}</div>
+                  </div>
+                </div>
+                <div style="padding: 12px; display: flex; flex-direction: column; gap: 12px;">
+                  <h2 style="margin: 0; font-size: 21px; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em;">{{ post.title }}</h2>
+                  <p style="margin: 0; font-size: 15px; line-height: 1.55; text-wrap: pretty;">{{ post.body }}</p>
+                  <div style="display: flex; flex-wrap: wrap; gap: 7px;">
+                    <sc-for list="{{ post.tags }}" as="t" hint-placeholder-count="2">
+                      <span style="{{ t.style }}">{{ t.label }}</span>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: stretch; border-top: 2px solid #000;">
+                  <button onClick="{{ like }}" data-id="{{ post.id }}" style="{{ post.likeStyle }}"><i class="{{ post.likeIcon }}" style="font-size: 18px;"></i><span style="font-variant-numeric: tabular-nums;">{{ post.likes }}</span></button>
+                  <button style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 46px; background: #fff; border: none; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: default;"><i class="ph-bold ph-chat-circle" style="font-size: 18px;"></i>{{ post.commentCount }}</button>
+                </div>
+                <sc-if value="{{ isMod }}" hint-placeholder-val="{{ false }}">
+                  <div style="border-top: 2px solid #000; padding: 12px; background: var(--nb-secondary-background); display: flex; align-items: center; gap: 10px;">
+                    <i class="ph-fill ph-shield-check" style="font-size: 18px; flex: none;"></i>
+                    <span style="flex: 1; font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;">Moderator</span>
+                    <button onClick="{{ toggleFlag }}" data-id="{{ post.id }}" style="{{ post.flagBtnStyle }}">{{ post.flagBtnLabel }}</button>
+                  </div>
+                </sc-if>
+              </article>
+
+              <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-top: 4px;">{{ post.commentHeading }}</div>
+
+              <div style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000;">
+                <sc-for list="{{ comments }}" as="c" hint-placeholder-count="2">
+                  <div style="{{ c.rowStyle }}">
+                    <div style="{{ c.avatarStyle }}">{{ c.initials }}</div>
+                    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px;">
+                      <div style="display: flex; align-items: center; gap: 7px; flex-wrap: wrap;">
+                        <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;">{{ c.meta }}</span>
+                        <sc-if value="{{ c.isAuthor }}" hint-placeholder-val="{{ false }}">
+                          <span style="padding: 2px 6px; border: 2px solid #000; background: var(--nb-secondary); font-family: var(--nb-font-mono); font-size: 9.5px; font-weight: 700; text-transform: uppercase;">author</span>
+                        </sc-if>
+                      </div>
+                      <div style="font-size: 15px; line-height: 1.5;">{{ c.text }}</div>
+                      <div style="display: flex; gap: 8px;">
+                        <button onClick="{{ likeComment }}" data-cid="{{ c.id }}" style="{{ c.likeStyle }}"><i class="{{ c.likeIcon }}" style="font-size: 14px;"></i>{{ c.likes }}</button>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+                <div style="padding: 12px; display: flex; gap: 9px; border-top: 2px solid #000;">
+                  <input type="text" value="{{ commentDraft }}" onChange="{{ setComment }}" placeholder="{{ commentPlaceholder }}" disabled="{{ commentDisabled }}" style="{{ commentInputStyle }}" />
+                  <button onClick="{{ addComment }}" style="{{ commentSendStyle }}" aria-label="Send comment"><i class="ph-bold ph-paper-plane-right" style="font-size: 18px;"></i></button>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isCreate }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Create post" style="padding: 16px 14px 20px; display: flex; flex-direction: column; gap: 16px;">
+              <label style="display: flex; flex-direction: column; gap: 7px;">
+                <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">Category</span>
+                <select value="{{ draftCat }}" onChange="{{ setDraftCat }}" style="height: 46px; padding: 0 10px; background: var(--nb-field-bg); border: 2px solid #000; font-size: 15px; font-weight: 700; appearance: none;">
+                  <option value="Integration">Integration</option>
+                  <option value="Compliance">Compliance</option>
+                  <option value="Webhooks">Webhooks</option>
+                  <option value="SDK">SDK</option>
+                  <option value="Billing">Billing</option>
+                </select>
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 7px;">
+                <span style="{{ titleLabelStyle }}">{{ titleLabel }}</span>
+                <input type="text" value="{{ draftTitle }}" onChange="{{ setDraftTitle }}" placeholder="What's the question?" style="{{ titleInputStyle }}" />
+                <sc-if value="{{ titleError }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size: 13px; font-weight: 700;">Give the post a title before publishing.</span>
+                </sc-if>
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 7px;">
+                <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">Body</span>
+                <textarea rows="6" value="{{ draftBody }}" onChange="{{ setDraftBody }}" placeholder="Context, error text, the request you sent." style="padding: 10px 12px; background: var(--nb-field-bg); border: 2px solid #000; font-size: 15px; font-weight: 500; resize: vertical;"></textarea>
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 7px;">
+                <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">Tags — comma separated</span>
+                <input type="text" value="{{ draftTags }}" onChange="{{ setDraftTags }}" placeholder="android, liveness" style="height: 46px; padding: 0 12px; background: var(--nb-field-bg); border: 2px solid #000; font-size: 15px; font-weight: 500;" />
+              </label>
+              <div style="display: flex; gap: 10px;">
+                <button onClick="{{ submitPost }}" style="flex: 1; height: 50px; background: var(--nb-primary); border: 2px solid #000; box-shadow: 4px 4px 0 #000; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; cursor: pointer; transition: transform .08s, box-shadow .08s;" style-active="{ transform: 'translate(4px, 4px)', boxShadow: 'none' }">Publish</button>
+                <button onClick="{{ goFeed }}" style="width: 100px; height: 50px; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;">Cancel</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isMod2 }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Moderation queue" style="padding: 14px 14px 20px; display: flex; flex-direction: column; gap: 14px;">
+              <sc-if value="{{ modDenied }}" hint-placeholder-val="{{ false }}">
+                <div style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; padding: 22px 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px;">
+                  <div style="width: 44px; height: 44px; border: 2px solid #000; background: var(--nb-secondary-background); display: flex; align-items: center; justify-content: center;"><i class="ph-bold ph-lock-simple" style="font-size: 22px;"></i></div>
+                  <div style="font-size: 17px; font-weight: 700; text-transform: uppercase;">Moderators only</div>
+                  <div style="font-size: 14px; line-height: 1.5;">This queue is for accounts with the moderator role. Sign in as one from the login screen.</div>
+                  <button onClick="{{ signOut }}" style="height: 42px; padding: 0 14px; background: var(--nb-secondary); border: 2px solid #000; box-shadow: 3px 3px 0 #000; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;">Switch account</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ isMod }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; gap: 10px;">
+                  <div style="flex: 1; border: 2px solid #000; background: var(--nb-warning); box-shadow: 4px 4px 0 #000; padding: 12px;">
+                    <div style="font-size: 26px; font-weight: 700; line-height: 1;">{{ flaggedCount }}</div>
+                    <div style="font-family: var(--nb-font-mono); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-top: 4px;">Flagged</div>
+                  </div>
+                  <div style="flex: 1; border: 2px solid #000; background: #fff; box-shadow: 4px 4px 0 #000; padding: 12px;">
+                    <div style="font-size: 26px; font-weight: 700; line-height: 1;">{{ totalCount }}</div>
+                    <div style="font-family: var(--nb-font-mono); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-top: 4px;">Total posts</div>
+                  </div>
+                </div>
+                <sc-for list="{{ queue }}" as="q" hint-placeholder-count="4">
+                  <div style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000;">
+                    <div onClick="{{ openPost }}" data-id="{{ q.id }}" style="padding: 12px; display: flex; flex-direction: column; gap: 7px; cursor: pointer;">
+                      <div style="font-family: var(--nb-font-mono); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;">{{ q.meta }}</div>
+                      <div style="font-size: 15px; font-weight: 700; line-height: 1.3;">{{ q.title }}</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-top: 2px solid #000;">
+                      <span style="{{ q.statusStyle }}">{{ q.status }}</span>
+                      <button onClick="{{ toggleFlag }}" data-id="{{ q.id }}" style="{{ q.btnStyle }}">{{ q.btnLabel }}</button>
+                    </div>
+                  </div>
+                </sc-for>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Profile" style="padding: 14px 14px 20px; display: flex; flex-direction: column; gap: 14px;">
+              <div style="border: 2px solid #000; background: var(--nb-primary); box-shadow: 4px 4px 0 #000; padding: 16px; display: flex; align-items: center; gap: 14px;">
+                <div style="width: 58px; height: 58px; flex: none; border: 2px solid #000; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700;">{{ myInitials }}</div>
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-size: 20px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em;">{{ myName }}</div>
+                  <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-top: 4px;">{{ myRole }}</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <div style="flex: 1; border: 2px solid #000; background: #fff; box-shadow: 4px 4px 0 #000; padding: 12px;">
+                  <div style="font-size: 24px; font-weight: 700; line-height: 1;">{{ myPostCount }}</div>
+                  <div style="font-family: var(--nb-font-mono); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-top: 4px;">Posts</div>
+                </div>
+                <div style="flex: 1; border: 2px solid #000; background: var(--nb-accent); box-shadow: 4px 4px 0 #000; padding: 12px;">
+                  <div style="font-size: 24px; font-weight: 700; line-height: 1;">{{ myLikeCount }}</div>
+                  <div style="font-family: var(--nb-font-mono); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-top: 4px;">Likes given</div>
+                </div>
+              </div>
+              <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-top: 4px;">Your posts</div>
+              <sc-for list="{{ myPosts }}" as="p" hint-placeholder-count="2">
+                <div onClick="{{ openPost }}" data-id="{{ p.id }}" style="background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; padding: 12px; display: flex; flex-direction: column; gap: 6px; cursor: pointer;">
+                  <div style="font-family: var(--nb-font-mono); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;">{{ p.meta }}</div>
+                  <div style="font-size: 15px; font-weight: 700; line-height: 1.3;">{{ p.title }}</div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ noMyPosts }}" hint-placeholder-val="{{ false }}">
+                <div style="background: #fff; border: 2px dashed #000; padding: 18px; font-size: 14px; line-height: 1.5;">You haven't posted yet. The plus button in the tab bar starts one.</div>
+              </sc-if>
+              <button onClick="{{ signOut }}" style="height: 46px; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer; margin-top: 6px;">{{ signOutLabel }}</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Filter sheet" style="position: absolute; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: flex-end;">
+              <div style="width: 100%; background: #fff; border-top: 3px solid #000;">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; background: var(--nb-accent); border-bottom: 2px solid #000;">
+                  <span style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;">Filter</span>
+                  <button onClick="{{ clearFilters }}" style="height: 32px; padding: 0 10px; background: #fff; border: 2px solid #000; font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer;">Reset</button>
+                </div>
+                <div style="padding: 14px; display: flex; flex-direction: column; gap: 16px;">
+                  <label style="display: flex; flex-direction: column; gap: 7px;">
+                    <span style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;">Keyword</span>
+                    <input type="text" value="{{ query }}" onChange="{{ setQuery }}" placeholder="Title or body" style="height: 44px; padding: 0 12px; background: var(--nb-field-bg); border: 2px solid #000; font-size: 15px; font-weight: 500;" />
+                  </label>
+                  <div>
+                    <div style="font-family: var(--nb-font-mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 9px;">Category</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                      <sc-for list="{{ chips }}" as="chip" hint-placeholder-count="5">
+                        <button onClick="{{ toggleChip }}" data-chip="{{ chip.label }}" style="{{ chip.style }}">{{ chip.label }}</button>
+                      </sc-for>
+                    </div>
+                  </div>
+                  <label style="display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; font-weight: 700; cursor: pointer;">
+                    <input type="checkbox" checked="{{ hideFlagged }}" onChange="{{ toggleHideFlagged }}" style="width: 20px; height: 20px; accent-color: #000;" />
+                    Hide flagged posts
+                  </label>
+                  <button onClick="{{ applyFilters }}" style="height: 48px; background: var(--nb-primary); border: 2px solid #000; box-shadow: 4px 4px 0 #000; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; cursor: pointer; transition: transform .08s, box-shadow .08s;" style-active="{ transform: 'translate(4px, 4px)', boxShadow: 'none' }">{{ applyLabel }}</button>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; align-items: center; gap: 9px; padding: 12px; background: #000; color: #fff; border: 2px solid #000;">
+              <i class="ph-fill ph-info" style="font-size: 17px; flex: none;"></i>
+              <span style="font-size: 13px; font-weight: 700; line-height: 1.4;">{{ toast }}</span>
+            </div>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+          <div style="flex: none; display: flex; background: #fff; border-top: 2px solid #000;">
+            <button onClick="{{ goFeed }}" style="{{ tabFeed }}"><i class="ph-fill ph-house" style="font-size: 19px;"></i><span style="font-family: var(--nb-font-mono); font-size: 9.5px; font-weight: 700; text-transform: uppercase;">Feed</span></button>
+            <button onClick="{{ openSheet }}" style="{{ tabSearch }}"><i class="ph-bold ph-magnifying-glass" style="font-size: 19px;"></i><span style="font-family: var(--nb-font-mono); font-size: 9.5px; font-weight: 700; text-transform: uppercase;">Filter</span></button>
+            <div style="flex: 1; height: 58px; display: flex; align-items: center; justify-content: center; border-right: 2px solid #000;">
+              <button onClick="{{ goCreate }}" style="width: 40px; height: 40px; border: 2px solid #000; background: var(--nb-primary); box-shadow: 3px 3px 0 #000; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform .08s, box-shadow .08s;" style-active="{ transform: 'translate(3px, 3px)', boxShadow: 'none' }" aria-label="New post"><i class="ph-bold ph-plus" style="font-size: 19px;"></i></button>
+            </div>
+            <button onClick="{{ goMod }}" style="{{ tabMod }}"><i class="ph-bold ph-shield-check" style="font-size: 19px;"></i><span style="font-family: var(--nb-font-mono); font-size: 9.5px; font-weight: 700; text-transform: uppercase;">Mod</span></button>
+            <button onClick="{{ goProfile }}" style="{{ tabYou }}"><i class="ph-bold ph-user" style="font-size: 19px;"></i><span style="font-family: var(--nb-font-mono); font-size: 9.5px; font-weight: 700; text-transform: uppercase;">You</span></button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div style="flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 20px;">
+      <div style="border: 2px solid #000; background: #fff; box-shadow: 4px 4px 0 #000; padding: 16px;">
+        <div style="font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 12px;">Try these</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.5;">
+          <div><span style="font-family: var(--nb-font-mono); font-weight: 700;">01</span> — Sign in as a moderator, open any post, flag it. The banner appears in the feed too.</div>
+          <div><span style="font-family: var(--nb-font-mono); font-weight: 700;">02</span> — Try to like your own post. Refused, with a reason.</div>
+          <div><span style="font-family: var(--nb-font-mono); font-weight: 700;">03</span> — Browse as a guest, then tap a heart.</div>
+          <div><span style="font-family: var(--nb-font-mono); font-weight: 700;">04</span> — Filter to Billing only. The empty state, not a blank list.</div>
+          <div><span style="font-family: var(--nb-font-mono); font-weight: 700;">05</span> — Publish with no title.</div>
+        </div>
+      </div>
+      <div style="border: 2px solid #000; background: var(--nb-field-bg); box-shadow: 4px 4px 0 #000; padding: 16px;">
+        <div style="font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 12px;">Force a state</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <button onClick="{{ reload }}" style="height: 40px; padding: 0 12px; background: #fff; border: 2px solid #000; box-shadow: 3px 3px 0 #000; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;">Loading</button>
+          <button onClick="{{ forceError }}" style="height: 40px; padding: 0 12px; background: var(--nb-danger); border: 2px solid #000; box-shadow: 3px 3px 0 #000; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;">503 error</button>
+          <button onClick="{{ signOut }}" style="height: 40px; padding: 0 12px; background: #fff; border: 2px solid #000; box-shadow: 3px 3px 0 #000; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer;">Login screen</button>
+        </div>
+      </div>
+      <div style="border: 2px solid #000; background: #fff; box-shadow: 4px 4px 0 #000; padding: 16px;">
+        <div style="font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 12px;">Above 768px</div>
+        <div style="font-size: 14px; line-height: 1.55;">The tab bar becomes a left rail and the filter sheet unfolds into a permanent sidebar. The post card does not change — same markup, same tokens, wider column.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:1100}}">
+const CATS = ["Integration", "Compliance", "Webhooks", "SDK", "Billing"];
+const AV = ["var(--nb-primary)", "var(--nb-accent)", "var(--nb-secondary)", "var(--nb-success)"];
+
+const SEED = [
+  { id: 1, title: "Liveness check times out on low-end Android before the second frame", body: "Consistent on devices under 3GB RAM. The SDK returns TIMEOUT_CAPTURE after roughly six seconds. Raising the capture window helps but pushes us past our SLA, and the retry lands on the same device profile. Has anyone tuned the frame buffer for this class of hardware?", author: "Thabo M.", cat: "Integration", tags: ["android", "liveness"], likes: 24, liked: false, flagged: false, ago: "4h",
+    comments: [
+      { id: 11, author: "Anele N.", text: "We hit this too. Bumping the capture window to 9s cleared it, but only after we moved the frame buffer off the main thread.", ago: "3h", likes: 8, liked: false, depth: 0, mine: false },
+      { id: 12, author: "Thabo M.", text: "Off-thread buffer did it. Thanks.", ago: "2h", likes: 2, liked: false, depth: 1 }
+    ] },
+  { id: 2, title: "You can skip the liveness step entirely if the document scan passes", body: "Posting this so the workaround is written down somewhere. If the document scan comes back clean we short-circuit the liveness call and mark the session verified.", author: "Riaan K.", cat: "Compliance", tags: ["kyc"], likes: 3, liked: false, mine: false, flagged: true, flaggedBy: "sipho", ago: "2d",
+    comments: [
+      { id: 21, author: "Sipho D.", text: "This is not a supported flow and it will fail an audit. Flagging it so nobody copies the snippet.", ago: "1d", likes: 19, liked: false, depth: 0, mine: false }
+    ] },
+  { id: 3, title: "Webhook retries arrive out of order after a 30s timeout", body: "Our endpoint acks in about 200ms normally. When it times out once, the retry for event N+1 lands before N. We de-duplicate on session id, but ordering matters for the audit trail.", author: "Anele N.", cat: "Webhooks", tags: ["retries", "ordering"], likes: 17, liked: false, mine: false, flagged: false, ago: "8h",
+    comments: [
+      { id: 31, author: "Riaan K.", text: "Sequence number is in the payload header. Sort on that rather than arrival time.", ago: "6h", likes: 11, liked: false, depth: 0, mine: false }
+    ] },
+  { id: 4, title: "Which document types are rejected before they reach the classifier?", body: "Trying to work out whether a rejection is a client-side size check or a real classification failure. The error code is the same in both cases.", author: "Sipho D.", cat: "SDK", tags: ["documents"], likes: 9, liked: false, mine: false, flagged: false, ago: "1d", comments: [] },
+  { id: 5, title: "Session count on the invoice doesn't match our own telemetry", body: "We count 12,400 completed sessions for the month, the invoice says 13,110. I assume abandoned sessions after the first frame are billable, but I would like that confirmed in writing.", author: "Lerato P.", cat: "Billing", tags: ["invoice"], likes: 6, liked: false, mine: false, flagged: false, ago: "3d", comments: [] }
+];
+
+class Component extends DCLogic {
+  state = {
+    screen: "login", user: null, register: false,
+    posts: SEED.map(p => ({ ...p, comments: p.comments.map(c => ({ ...c })) })),
+    activeId: null, loading: false, error: false, sheet: false,
+    q: "", cats: {}, hideFlagged: false, sort: "new",
+    draft: { title: "", body: "", cat: "Integration", tags: "" }, titleError: false,
+    commentDraft: "", toast: null, nextId: 100
+  };
+
+  componentWillUnmount() { clearTimeout(this._t); clearTimeout(this._l); }
+
+  flash(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+
+  load() {
+    this.setState({ loading: true, error: false });
+    clearTimeout(this._l);
+    this._l = setTimeout(() => this.setState({ loading: false }), 900);
+  }
+
+  avatar(name, size) {
+    const i = name.charCodeAt(0) % AV.length;
+    const s = size || 38;
+    return `width:${s}px;height:${s}px;flex:none;border:2px solid #000;background:${AV[i]};display:flex;align-items:center;justify-content:center;font-size:${s > 34 ? 13 : 11}px;font-weight:700;`;
+  }
+
+  initials(name) { return name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase(); }
+
+  tagStyle() { return "padding:4px 8px;border:2px solid #000;background:var(--nb-accent);font-family:var(--nb-font-mono);font-size:11px;font-weight:700;text-transform:uppercase;"; }
+
+  likeBtn(p, user) {
+    const guest = !user;
+    const own = !!user && p.author === user.name;
+    const bg = p.liked ? "var(--nb-primary)" : "#fff";
+    const dim = own ? "opacity:.45;cursor:not-allowed;" : "cursor:pointer;";
+    return `flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;height:46px;background:${bg};border:none;border-right:2px solid #000;font-family:var(--nb-font-sans);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;${guest ? "border-style:none;cursor:pointer;" : dim}`;
+  }
+
+  view(p, user) {
+    return {
+      id: p.id, title: p.title, body: p.body, excerpt: p.body.length > 150 ? p.body.slice(0, 148).trim() + "…" : p.body,
+      author: p.author, initials: this.initials(p.author), avatarStyle: this.avatar(p.author),
+      meta: `${p.cat} · ${p.ago}`, mine: !!user && p.author === user.name,
+      flagged: p.flagged, flagText: p.flagged ? `Flagged as misleading by @${p.flaggedBy || "mod"}` : "",
+      tags: p.tags.map(t => ({ label: t, style: this.tagStyle() })),
+      likes: p.likes, liked: p.liked, likeIcon: p.liked ? "ph-fill ph-heart" : "ph-bold ph-heart",
+      likeStyle: this.likeBtn(p, user),
+      commentCount: p.comments.length,
+      commentHeading: p.comments.length === 1 ? "1 comment" : `${p.comments.length} comments`,
+      flagBtnLabel: p.flagged ? "Unflag" : "Flag as misleading",
+      flagBtnStyle: `height:36px;padding:0 12px;background:${p.flagged ? "var(--nb-secondary)" : "var(--nb-warning)"};border:2px solid #000;font-family:var(--nb-font-sans);font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;`
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const user = s.user;
+    const signedIn = !!user;
+    const isMod = !!user && user.isMod;
+    const screen = s.screen;
+
+    let feed = s.posts.filter(p => {
+      if (s.hideFlagged && p.flagged) return false;
+      const active = CATS.filter(c => s.cats[c]);
+      if (active.length && !active.includes(p.cat)) return false;
+      if (s.q.trim()) {
+        const q = s.q.toLowerCase();
+        if (!(p.title + " " + p.body).toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+    if (s.sort === "top") feed = [...feed].sort((a, b) => b.likes - a.likes);
+    else if (s.sort === "open") feed = feed.filter(p => p.comments.length === 0);
+
+    const post = s.posts.find(p => p.id === s.activeId) || s.posts[0];
+    const pv = this.view(post, user);
+    const activeFilters = CATS.filter(c => s.cats[c]).length + (s.q.trim() ? 1 : 0) + (s.hideFlagged ? 1 : 0);
+
+    const tab = (on) => `flex:1;height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:${on ? "var(--nb-accent)" : "#fff"};border:none;border-right:2px solid #000;cursor:pointer;color:#000;`;
+    const seg = (on, last) => `flex:1;height:42px;background:${on ? "var(--nb-accent)" : "#fff"};color:#000;border:none;${last ? "" : "border-right:2px solid #000;"}font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;`;
+
+    const barTitles = { login: "Sign in", feed: "Forum", detail: "Thread", create: "New post", mod: "Moderation", profile: "Account" };
+    const showList = !s.loading && !s.error && feed.length > 0;
+
+    const like = e => {
+      const id = +e.currentTarget.dataset.id;
+      if (!user) return this.flash("Sign in to like posts.");
+      const p = s.posts.find(x => x.id === id);
+      if (p.author === user.name) return this.flash("You can't like your own post.");
+      this.setState(st => ({ posts: st.posts.map(x => x.id === id ? { ...x, liked: !x.liked, likes: x.likes + (x.liked ? -1 : 1) } : x) }));
+    };
+
+    const openPost = e => this.setState({ screen: "detail", activeId: +e.currentTarget.dataset.id, sheet: false });
+
+    const toggleFlag = e => {
+      const id = +e.currentTarget.dataset.id;
+      if (!isMod) return this.flash("Only moderators can flag a post.");
+      this.setState(st => ({
+        posts: st.posts.map(x => x.id === id ? { ...x, flagged: !x.flagged, flaggedBy: user.handle } : x)
+      }));
+      const p = s.posts.find(x => x.id === id);
+      this.flash(p.flagged ? "Flag removed." : "Flagged as misleading.");
+    };
+
+    return {
+      barTitle: barTitles[screen] || "Forum",
+      barIcon: screen === "detail" || screen === "create" ? "ph-bold ph-arrow-left" : "ph-bold ph-list",
+      barAction: () => this.setState({ screen: screen === "detail" || screen === "create" ? "feed" : "feed", titleError: false }),
+      showFilterBtn: screen === "feed",
+      filterLabel: activeFilters ? String(activeFilters) : "Filter",
+      signedIn, isMod,
+      myInitials: user ? user.initials : "",
+      myName: user ? user.name : "Guest",
+      myRole: user ? (user.isMod ? "Moderator · " + user.handle : "Member · " + user.handle) : "Anonymous",
+      myAvatarStyle: "width:30px;height:30px;flex:none;border:2px solid #000;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;",
+
+      isLogin: screen === "login",
+      isFeed: screen === "feed",
+      isDetail: screen === "detail",
+      isCreate: screen === "create",
+      isMod2: screen === "mod",
+      isProfile: screen === "profile",
+      showNav: screen !== "login",
+      modDenied: screen === "mod" && !isMod,
+
+      isRegister: s.register,
+      authHeading: s.register ? "Create an account" : "Welcome back",
+      authCta: s.register ? "Create account" : "Sign in",
+      authSwitch: s.register ? "Already have an account? Sign in" : "No account? Create one",
+      toggleRegister: () => this.setState(st => ({ register: !st.register })),
+      signInUser: () => { this.setState({ user: { name: "Thabo M.", initials: "TM", handle: "@thabo", isMod: false }, screen: "feed", register: false }); this.load(); },
+      signInMod: () => { this.setState({ user: { name: "Sipho D.", initials: "SD", handle: "@sipho", isMod: true }, screen: "feed", register: false }); this.load(); },
+      browseGuest: () => { this.setState({ user: null, screen: "feed" }); this.load(); },
+      signOut: () => this.setState({ user: null, screen: "login", sheet: false }),
+      signOutLabel: signedIn ? "Sign out" : "Sign in",
+      guestNotice: screen === "feed" && !signedIn,
+
+      sorts: [
+        { key: "new", label: "New", style: seg(s.sort === "new") },
+        { key: "top", label: "Top", style: seg(s.sort === "top") },
+        { key: "open", label: "Unanswered", style: seg(s.sort === "open", true) }
+      ],
+      setSort: e => this.setState({ sort: e.currentTarget.dataset.sort }),
+
+      isLoading: s.loading,
+      isError: !s.loading && s.error,
+      isEmpty: !s.loading && !s.error && feed.length === 0,
+      skeletons: s.loading ? [1, 2, 3] : [],
+      feed: showList ? feed.map(p => this.view(p, user)) : [],
+      reload: () => { this.setState({ screen: "feed" }); this.load(); },
+      forceError: () => this.setState({ screen: "feed", loading: false, error: true }),
+
+      post: pv,
+      comments: post.comments.map(c => ({
+        id: c.id, text: c.text, initials: this.initials(c.author),
+        avatarStyle: this.avatar(c.author, 30),
+        meta: `${c.author} · ${c.ago}`,
+        isAuthor: c.author === post.author,
+        likes: c.likes, likeIcon: c.liked ? "ph-fill ph-heart" : "ph-bold ph-heart",
+        likeStyle: `display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 10px;background:${c.liked ? "var(--nb-primary)" : "#fff"};border:2px solid #000;font-family:var(--nb-font-mono);font-size:11px;font-weight:700;text-transform:uppercase;${signedIn && c.author === user.name ? "opacity:.45;cursor:not-allowed;" : "cursor:pointer;"}`,
+        rowStyle: `padding:12px 12px 12px ${12 + c.depth * 22}px;border-bottom:2px solid #000;display:flex;gap:10px;${c.depth ? "background:var(--nb-secondary-background);" : ""}`
+      })),
+      likeComment: e => {
+        const cid = +e.currentTarget.dataset.cid;
+        if (!user) return this.flash("Sign in to like comments.");
+        const c = post.comments.find(x => x.id === cid);
+        if (c.author === user.name) return this.flash("You can't like your own comment.");
+        this.setState(st => ({
+          posts: st.posts.map(p => p.id !== post.id ? p : { ...p, comments: p.comments.map(x => x.id === cid ? { ...x, liked: !x.liked, likes: x.likes + (x.liked ? -1 : 1) } : x) })
+        }));
+      },
+      commentDraft: s.commentDraft,
+      commentPlaceholder: signedIn ? "Add a comment" : "Sign in to comment",
+      commentDisabled: !signedIn,
+      commentInputStyle: `flex:1;min-width:0;height:44px;padding:0 12px;background:${signedIn ? "var(--nb-field-bg)" : "var(--nb-secondary-background)"};border:2px solid #000;font-size:15px;font-weight:500;${signedIn ? "" : "opacity:.6;"}`,
+      commentSendStyle: `width:48px;height:44px;flex:none;display:inline-flex;align-items:center;justify-content:center;background:${signedIn ? "var(--nb-primary)" : "#fff"};border:2px solid #000;${signedIn ? "cursor:pointer;" : "opacity:.45;cursor:not-allowed;"}`,
+      setComment: e => this.setState({ commentDraft: e.target.value }),
+      addComment: () => {
+        if (!signedIn) return this.flash("Sign in to comment.");
+        const text = s.commentDraft.trim();
+        if (!text) return this.flash("Write something first.");
+        const c = { id: s.nextId, author: user.name, text, ago: "now", likes: 0, liked: false, depth: 0 };
+        this.setState(st => ({
+          nextId: st.nextId + 1, commentDraft: "",
+          posts: st.posts.map(p => p.id === post.id ? { ...p, comments: [...p.comments, c] } : p)
+        }));
+      },
+
+      like, openPost, toggleFlag,
+
+      draftTitle: s.draft.title, draftBody: s.draft.body, draftCat: s.draft.cat, draftTags: s.draft.tags,
+      titleError: s.titleError,
+      titleLabel: s.titleError ? "Title — required" : "Title",
+      titleLabelStyle: "font-family:var(--nb-font-mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;",
+      titleInputStyle: `height:46px;padding:0 12px;background:var(--nb-field-bg);border:${s.titleError ? "3px solid var(--nb-danger)" : "2px solid #000"};font-size:15px;font-weight:500;`,
+      setDraftTitle: e => this.setState(st => ({ draft: { ...st.draft, title: e.target.value }, titleError: false })),
+      setDraftBody: e => this.setState(st => ({ draft: { ...st.draft, body: e.target.value } })),
+      setDraftCat: e => this.setState(st => ({ draft: { ...st.draft, cat: e.target.value } })),
+      setDraftTags: e => this.setState(st => ({ draft: { ...st.draft, tags: e.target.value } })),
+      submitPost: () => {
+        if (!signedIn) return this.flash("Sign in to post.");
+        if (!s.draft.title.trim()) { this.setState({ titleError: true }); return this.flash("The post needs a title."); }
+        const p = {
+          id: s.nextId, title: s.draft.title.trim(), body: s.draft.body.trim() || "No detail given.",
+          author: user.name, cat: s.draft.cat,
+          tags: s.draft.tags.split(",").map(t => t.trim()).filter(Boolean).slice(0, 3),
+          likes: 0, liked: false, flagged: false, ago: "now", comments: []
+        };
+        this.setState(st => ({ posts: [p, ...st.posts], nextId: st.nextId + 1, draft: { title: "", body: "", cat: "Integration", tags: "" }, screen: "feed", titleError: false }));
+        this.flash("Posted.");
+      },
+
+      flaggedCount: s.posts.filter(p => p.flagged).length,
+      totalCount: s.posts.length,
+      queue: [...s.posts].sort((a, b) => (b.flagged ? 1 : 0) - (a.flagged ? 1 : 0)).map(p => ({
+        id: p.id, title: p.title, meta: `${p.author} · ${p.cat} · ${p.ago}`,
+        status: p.flagged ? "Flagged" : "Clear",
+        statusStyle: `flex:1;padding:4px 8px;border:2px solid #000;background:${p.flagged ? "var(--nb-warning)" : "var(--nb-success)"};font-family:var(--nb-font-mono);font-size:10.5px;font-weight:700;text-transform:uppercase;text-align:center;`,
+        btnLabel: p.flagged ? "Unflag" : "Flag",
+        btnStyle: `height:36px;padding:0 14px;background:${p.flagged ? "var(--nb-secondary)" : "#fff"};border:2px solid #000;font-family:var(--nb-font-sans);font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;`
+      })),
+
+      myPosts: signedIn ? s.posts.filter(p => p.author === user.name).map(p => ({ id: p.id, title: p.title, meta: `${p.cat} · ${p.ago} · ${p.likes} likes` })) : [],
+      noMyPosts: !signedIn || s.posts.filter(p => p.author === user.name).length === 0,
+      myPostCount: signedIn ? s.posts.filter(p => p.author === user.name).length : 0,
+      myLikeCount: s.posts.filter(p => p.liked).length,
+
+      sheetOpen: s.sheet,
+      openSheet: () => this.setState({ screen: "feed", sheet: true }),
+      query: s.q,
+      setQuery: e => this.setState({ q: e.target.value }),
+      chips: CATS.map(label => {
+        const on = !!s.cats[label];
+        return { label, style: `height:36px;padding:0 12px;background:${on ? "var(--nb-accent)" : "#fff"};color:#000;border:2px solid #000;${on ? "box-shadow:3px 3px 0 #000;" : ""}font-family:var(--nb-font-sans);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;` };
+      }),
+      toggleChip: e => { const k = e.currentTarget.dataset.chip; this.setState(st => ({ cats: { ...st.cats, [k]: !st.cats[k] } })); },
+      hideFlagged: s.hideFlagged,
+      toggleHideFlagged: () => this.setState(st => ({ hideFlagged: !st.hideFlagged })),
+      applyLabel: `Show ${feed.length} ${feed.length === 1 ? "post" : "posts"}`,
+      applyFilters: () => this.setState({ sheet: false }),
+      clearFilters: () => this.setState({ q: "", cats: {}, hideFlagged: false, sheet: false }),
+
+      goFeed: () => this.setState({ screen: "feed", sheet: false, titleError: false }),
+      goCreate: () => (signedIn ? this.setState({ screen: "create", sheet: false }) : this.flash("Sign in to post.")),
+      goMod: () => this.setState({ screen: "mod", sheet: false }),
+      goProfile: () => this.setState({ screen: "profile", sheet: false }),
+      tabFeed: tab(screen === "feed"),
+      tabSearch: tab(s.sheet),
+      tabMod: tab(screen === "mod"),
+      tabYou: tab(screen === "profile"),
+
+      toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>
