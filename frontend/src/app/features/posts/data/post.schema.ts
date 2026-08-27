@@ -1,54 +1,45 @@
 import { z } from 'zod';
-import { AuthorSchema } from '../../../core/auth/member.schema';
+import { TimestampSchema } from '../../../core/auth/member.schema';
 import { paged } from '../../../core/api/paged';
 
-export const FlagSchema = z.object({
-  flaggedBy: z.string().min(1),
-  flaggedAt: z.iso.datetime(),
-});
-export type Flag = z.infer<typeof FlagSchema>;
+export const MAX_TITLE_LENGTH = 200;
+export const MAX_BODY_LENGTH = 10_000;
 
 export const PostSchema = z.object({
   id: z.uuid(),
   title: z.string().min(1),
   body: z.string(),
-  author: AuthorSchema,
-  createdAt: z.iso.datetime(),
+  author: z.string().min(1),
+  createdAt: TimestampSchema,
+  isFlagged: z.boolean(),
   likeCount: z.number().int().nonnegative(),
   commentCount: z.number().int().nonnegative(),
-  likedByCurrentMember: z.boolean(),
-  flag: FlagSchema.nullable(),
 });
 export type Post = z.infer<typeof PostSchema>;
 
 export const CommentSchema = z.object({
   id: z.uuid(),
   postId: z.uuid(),
-  author: AuthorSchema,
+  author: z.string().min(1),
   body: z.string().min(1),
-  createdAt: z.iso.datetime(),
+  createdAt: TimestampSchema,
 });
 export type Comment = z.infer<typeof CommentSchema>;
 
 export const PagedPostsSchema = paged(PostSchema);
 export const PagedCommentsSchema = paged(CommentSchema);
 
-export const PostDetailSchema = PostSchema.extend({
-  comments: PagedCommentsSchema,
-});
-export type PostDetail = z.infer<typeof PostDetailSchema>;
-
 export const SortSchema = z.enum(['newest', 'oldest', 'most-liked']);
 export type Sort = z.infer<typeof SortSchema>;
 
 export const CreatePostSchema = z.object({
-  title: z.string().min(1, 'A title is required').max(200),
-  body: z.string().min(1, 'A body is required').max(10_000),
+  title: z.string().trim().min(1, 'A title is required').max(MAX_TITLE_LENGTH),
+  body: z.string().trim().min(1, 'A body is required').max(MAX_BODY_LENGTH),
 });
 export type CreatePost = z.infer<typeof CreatePostSchema>;
 
 export const CreateCommentSchema = z.object({
-  body: z.string().min(1, 'A comment cannot be empty').max(5_000),
+  body: z.string().trim().min(1, 'A comment cannot be empty'),
 });
 export type CreateComment = z.infer<typeof CreateCommentSchema>;
 

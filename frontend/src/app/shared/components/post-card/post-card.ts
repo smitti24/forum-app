@@ -16,7 +16,7 @@ export class PostCard {
   readonly post = input.required<Post>();
   readonly isAuthenticated = input(false);
   readonly isModerator = input(false);
-  readonly currentMemberId = input<string | null>(null);
+  readonly currentUsername = input<string | null>(null);
   readonly linkToDetail = input(true);
 
   readonly toggleLike = output<void>();

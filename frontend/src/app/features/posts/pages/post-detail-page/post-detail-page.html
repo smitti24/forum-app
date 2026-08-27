@@ -11,14 +11,14 @@
       [linkToDetail]="false"
       [isAuthenticated]="auth.isAuthenticated()"
       [isModerator]="auth.isModerator()"
-      [currentMemberId]="auth.memberId()"
-      (toggleLike)="toggleLike(detail.likedByCurrentMember)"
-      (flagPost)="setFlag(false)"
-      (unflag)="setFlag(true)"
+      [currentUsername]="auth.username()"
+      (toggleLike)="like()"
+      (flagPost)="setFlag(detail.isFlagged)"
+      (unflag)="setFlag(detail.isFlagged)"
     />
 
     <h2 class="font-mono text-[12px] font-bold tracking-[0.06em] uppercase">
-      {{ detail.comments.total }} comments
+      {{ detail.commentCount }} comments
     </h2>
 
     @if (auth.isAuthenticated()) {
@@ -38,10 +38,14 @@
       <app-empty-state headline="Sign in to comment" message="Visitors can read every discussion." />
     }
 
-    @if (detail.comments.items.length === 0) {
+    @if (comments.isLoading()) {
+      <app-skeleton-list [count]="2" />
+    } @else if (comments.error()) {
+      <app-error-state (retry)="comments.reload()" message="The comments could not be loaded." />
+    } @else if (comments.hasValue() && comments.value()!.items.length === 0) {
       <app-empty-state headline="No comments yet" message="Be the first to reply." />
-    } @else {
-      @for (comment of detail.comments.items; track comment.id) {
+    } @else if (comments.hasValue()) {
+      @for (comment of comments.value()!.items; track comment.id) {
         <app-comment-item [comment]="comment" />
       }
     }

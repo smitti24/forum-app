@@ -12,10 +12,9 @@ type LikeDisabledReason = 'guest' | 'own-post' | null;
     <button
       nbButton
       size="sm"
-      [tone]="post().likedByCurrentMember ? 'primary' : 'white'"
+      tone="white"
       [disabled]="reason() === 'own-post'"
       [attr.aria-label]="label()"
-      [attr.aria-pressed]="post().likedByCurrentMember"
       [class.opacity-45]="reason() === 'own-post'"
       [class.border-dashed]="reason() === 'guest'"
       type="button"
@@ -28,21 +27,17 @@ type LikeDisabledReason = 'guest' | 'own-post' | null;
 export class LikeButton {
   readonly post = input.required<Post>();
   readonly isAuthenticated = input(false);
-  readonly currentMemberId = input<string | null>(null);
+  readonly currentUsername = input<string | null>(null);
 
   readonly toggle = output<void>();
 
   protected readonly reason = computed<LikeDisabledReason>(() => {
     if (!this.isAuthenticated()) return 'guest';
-    if (this.post().author.id === this.currentMemberId()) return 'own-post';
+    if (this.post().author === this.currentUsername()) return 'own-post';
     return null;
   });
 
   protected readonly label = computed(() =>
-    this.reason() === 'own-post'
-      ? 'You cannot like your own post'
-      : this.post().likedByCurrentMember
-        ? 'Remove your like'
-        : 'Like this post',
+    this.reason() === 'own-post' ? 'You cannot like your own post' : 'Like this post',
   );
 }

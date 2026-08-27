@@ -21,10 +21,10 @@
           [post]="post"
           [isAuthenticated]="auth.isAuthenticated()"
           [isModerator]="auth.isModerator()"
-          [currentMemberId]="auth.memberId()"
-          (toggleLike)="toggleLike(post.id, post.likedByCurrentMember)"
-          (flagPost)="setFlag(post.id, false)"
-          (unflag)="setFlag(post.id, true)"
+          [currentUsername]="auth.username()"
+          (toggleLike)="like(post.id)"
+          (flagPost)="setFlag(post.id, post.isFlagged)"
+          (unflag)="setFlag(post.id, post.isFlagged)"
         />
       }
 

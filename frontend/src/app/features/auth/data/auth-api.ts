@@ -5,7 +5,7 @@ import { API_BASE_URL } from '../../../core/api/api.config';
 import { parseWith } from '../../../core/api/parse';
 import { AuthStore } from '../../../core/auth/auth-store';
 import { MemberSchema } from '../../../core/auth/member.schema';
-import { AuthResponseSchema, Login, Register } from './auth.schema';
+import { Login, Register, RegisteredResponseSchema, TokenResponseSchema } from './auth.schema';
 
 @Injectable({ providedIn: 'root' })
 export class AuthApi {
@@ -14,21 +14,24 @@ export class AuthApi {
   private readonly store = inject(AuthStore);
 
   async login(input: Login): Promise<void> {
-    const { token, member } = await firstValueFrom(
+    const token = await firstValueFrom(
       this.http
         .post<unknown>(`${this.baseUrl}/auth/login`, input)
-        .pipe(map(parseWith(AuthResponseSchema))),
+        .pipe(map(parseWith(TokenResponseSchema))),
     );
-    this.store.signIn(token, member);
+
+    this.store.setToken(token.accessToken, token.expiresAt);
+    this.store.setMember(await this.me());
   }
 
   async register(input: Register): Promise<void> {
-    const { token, member } = await firstValueFrom(
+    await firstValueFrom(
       this.http
         .post<unknown>(`${this.baseUrl}/auth/register`, input)
-        .pipe(map(parseWith(AuthResponseSchema))),
+        .pipe(map(parseWith(RegisteredResponseSchema))),
     );
-    this.store.signIn(token, member);
+
+    await this.login({ identifier: input.username, password: input.password });
   }
 
   me() {

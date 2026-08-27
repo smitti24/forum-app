@@ -10,15 +10,7 @@ import { ErrorState } from '../../../../shared/states/error-state/error-state';
 
 @Component({
   selector: 'app-post-detail-page',
-  imports: [
-    NbButton,
-    NbTextarea,
-    PostCard,
-    CommentItem,
-    SkeletonList,
-    EmptyState,
-    ErrorState,
-  ],
+  imports: [NbButton, NbTextarea, PostCard, CommentItem, SkeletonList, EmptyState, ErrorState],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './post-detail-page.html',
 })
@@ -29,7 +21,10 @@ export class PostDetailPage {
   readonly id = input.required<string>();
 
   private readonly postId = computed(() => this.id());
+  protected readonly commentPage = signal(1);
+
   protected readonly post = this.api.postResource(this.postId);
+  protected readonly comments = this.api.commentsResource(this.postId, this.commentPage);
 
   protected readonly draft = signal('');
   protected readonly submitting = signal(false);
@@ -42,19 +37,20 @@ export class PostDetailPage {
     try {
       await this.api.createComment(this.id(), { body });
       this.draft.set('');
+      this.comments.reload();
       this.post.reload();
     } finally {
       this.submitting.set(false);
     }
   }
 
-  protected async toggleLike(liked: boolean): Promise<void> {
-    await (liked ? this.api.unlike(this.id()) : this.api.like(this.id()));
+  protected async like(): Promise<void> {
+    await this.api.like(this.id());
     this.post.reload();
   }
 
-  protected async setFlag(flagged: boolean): Promise<void> {
-    await (flagged ? this.api.unflag(this.id()) : this.api.flag(this.id()));
+  protected async setFlag(isFlagged: boolean): Promise<void> {
+    await (isFlagged ? this.api.unflag(this.id()) : this.api.flag(this.id()));
     this.post.reload();
   }
 }

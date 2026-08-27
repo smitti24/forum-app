@@ -1,17 +1,17 @@
-<article nbSurface shadow="default" padding="none" [class.opacity-80]="post().flag">
+<article nbSurface shadow="default" padding="none" [class.opacity-80]="post().isFlagged">
   <div nbCluster align="center" gap="sm" padding="sm">
     <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">
-      {{ post().author.username }}
+      {{ post().author }}
     </span>
     <span class="font-mono text-[11px] font-medium tracking-[0.06em] uppercase opacity-70">
       {{ post().createdAt | date: 'short' }}
     </span>
   </div>
 
-  @if (post().flag || isModerator()) {
+  @if (post().isFlagged || isModerator()) {
     <div class="border-t-2 border-black p-3">
       <app-moderation-bar
-        [flag]="post().flag"
+        [isFlagged]="post().isFlagged"
         [isModerator]="isModerator()"
         (flagPost)="flagPost.emit()"
         (unflag)="unflag.emit()"
@@ -32,7 +32,7 @@
     <app-like-button
       [post]="post()"
       [isAuthenticated]="isAuthenticated()"
-      [currentMemberId]="currentMemberId()"
+      [currentUsername]="currentUsername()"
       (toggle)="toggleLike.emit()"
     />
     <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">
