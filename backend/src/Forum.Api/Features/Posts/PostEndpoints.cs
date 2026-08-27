@@ -39,11 +39,17 @@ public static class PostEndpoints
         FlagSummary? Flag,
         Paged<CommentEndpoints.CommentResponse> Comments);
 
+    public static readonly string[] SortOptions = ["newest", "oldest", "most-liked"];
+
     public static RouteGroupBuilder MapPosts(this RouteGroupBuilder group)
     {
         group.MapPost("/", CreateAsync)
             .RequireAuthorization()
             .WithSummary("Create a post.");
+
+        group.MapGet("/", ListAsync)
+            .AllowAnonymous()
+            .WithSummary("List posts, filtered by date range, author and flag state, sorted and paged.");
 
         group.MapGet("/{id:guid}", GetAsync)
             .AllowAnonymous()
@@ -51,6 +57,83 @@ public static class PostEndpoints
 
         return group;
     }
+
+    private static async Task<IResult> ListAsync(
+        ClaimsPrincipal principal,
+        ForumDbContext db,
+        CancellationToken ct,
+        DateTimeOffset? from = null,
+        DateTimeOffset? to = null,
+        string? author = null,
+        bool? flagged = null,
+        string? sort = null,
+        int? page = null,
+        int? pageSize = null)
+    {
+        if (sort is not null && !SortOptions.Contains(sort))
+        {
+            return Results.ValidationProblem(new Dictionary<string, string[]>
+            {
+                ["sort"] = [$"Sort must be one of: {string.Join(", ", SortOptions)}."]
+            });
+        }
+
+        var memberId = principal.MemberId();
+        var (resolvedPage, resolvedPageSize) = Paging.Clamp(page, pageSize);
+
+        var query = db.Posts.AsQueryable();
+
+        if (from is { } fromValue)
+        {
+            var fromUtc = fromValue.UtcDateTime;
+            query = query.Where(p => p.CreatedAt >= fromUtc);
+        }
+
+        if (to is { } toValue)
+        {
+            var toUtc = toValue.UtcDateTime;
+            query = query.Where(p => p.CreatedAt <= toUtc);
+        }
+
+        if (!string.IsNullOrWhiteSpace(author))
+        {
+            var authorNormalized = Identity.Normalise(author);
+            query = query.Where(p => p.Author.UsernameNormalized == authorNormalized);
+        }
+
+        if (flagged is { } flaggedValue)
+        {
+            query = query.Where(p => p.IsFlagged == flaggedValue);
+        }
+
+        var total = await query.CountAsync(ct);
+
+        query = sort switch
+        {
+            "oldest" => query.OrderBy(p => p.CreatedAt).ThenBy(p => p.Id),
+            "most-liked" => query.OrderByDescending(p => p.LikeCount).ThenByDescending(p => p.Id),
+            _ => query.OrderByDescending(p => p.CreatedAt).ThenByDescending(p => p.Id)
+        };
+
+        var items = await Project(
+                query.Skip((resolvedPage - 1) * resolvedPageSize).Take(resolvedPageSize),
+                memberId)
+            .ToListAsync(ct);
+
+        return Results.Ok(new Paged<PostResponse>(items, resolvedPage, resolvedPageSize, total));
+    }
+
+    private static IQueryable<PostResponse> Project(IQueryable<Post> posts, Guid? memberId) =>
+        posts.Select(p => new PostResponse(
+            p.Id,
+            p.Title,
+            p.Body,
+            new AuthorSummary(p.AuthorId, p.Author.Username),
+            p.CreatedAt,
+            p.LikeCount,
+            p.CommentCount,
+            memberId != null && p.Likes.Any(l => l.MemberId == memberId),
+            p.IsFlagged ? new FlagSummary(p.FlaggedBy!.Username, p.FlaggedAt!.Value) : null));
 
     private static async Task<IResult> CreateAsync(
         CreatePostRequest request,
@@ -123,19 +206,7 @@ public static class PostEndpoints
     {
         var memberId = principal.MemberId();
 
-        var post = await db.Posts
-            .Where(p => p.Id == id)
-            .Select(p => new PostResponse(
-                p.Id,
-                p.Title,
-                p.Body,
-                new AuthorSummary(p.AuthorId, p.Author.Username),
-                p.CreatedAt,
-                p.LikeCount,
-                p.CommentCount,
-                memberId != null && p.Likes.Any(l => l.MemberId == memberId),
-                p.IsFlagged ? new FlagSummary(p.FlaggedBy!.Username, p.FlaggedAt!.Value) : null))
-            .SingleOrDefaultAsync(ct);
+        var post = await Project(db.Posts.Where(p => p.Id == id), memberId).SingleOrDefaultAsync(ct);
 
         if (post is null)
         {
