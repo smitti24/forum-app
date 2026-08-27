@@ -19,7 +19,20 @@ builder.Services.AddDbContext<ForumDbContext>(options =>
 
 builder.Services.AddSingleton<IPasswordHasher<Member>, PasswordHasher<Member>>();
 builder.Services.AddSingleton(TimeProvider.System);
-builder.Services.AddProblemDetails();
+builder.Services.AddProblemDetails(options =>
+    options.CustomizeProblemDetails = context =>
+    {
+        if (context.Exception is BadHttpRequestException)
+        {
+            context.ProblemDetails.Title = "Bad request";
+            context.ProblemDetails.Detail = "The request body could not be read as JSON.";
+        }
+        else if (context.ProblemDetails.Status == StatusCodes.Status500InternalServerError)
+        {
+            context.ProblemDetails.Title = "Unexpected error";
+            context.ProblemDetails.Detail = null;
+        }
+    });
 builder.Services.AddOpenApi();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -69,6 +82,15 @@ if (app.Environment.IsDevelopment() && app.Configuration.GetValue("Seed", true))
 {
     await app.Services.SeedAsync();
 }
+
+app.UseExceptionHandler(new ExceptionHandlerOptions
+{
+    StatusCodeSelector = exception => exception is BadHttpRequestException badRequest
+        ? badRequest.StatusCode
+        : StatusCodes.Status500InternalServerError
+});
+
+app.UseStatusCodePages();
 
 if (app.Environment.IsDevelopment())
 {
