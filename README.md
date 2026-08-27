@@ -154,7 +154,7 @@ The EF Core in-memory provider is not used anywhere. It enforces neither unique 
 
 Where a claim is about generated SQL rather than results, the test asserts the SQL: that ordering and range filtering translate rather than falling back to the client, and that list endpoints contain no `COUNT(` because counts are read from denormalised columns.
 
-The **20 front-end tests** are deliberately narrow, covering the three things most likely to break silently: the interceptor attaches the token and does not leak it to a non-API host; the guards redirect by authentication and by role; and the feed renders each of loading, empty, error and populated. One asserts that a response breaking the contract reaches the designed error state rather than a blank screen, which is the behaviour the Zod boundary exists to produce.
+Those front-end tests are deliberately narrow, and cover what would otherwise break silently: the interceptor attaches the token and does not leak it to a non-API host; the guards redirect by authentication and by role; and the feed renders each of loading, empty, error and populated. One asserts that a response breaking the contract reaches the designed error state rather than a blank screen, which is the behaviour the Zod boundary exists to produce.
 
 Browser end-to-end automation is out of scope; end-to-end verification is a manual pass through the UI and Postman.
 
