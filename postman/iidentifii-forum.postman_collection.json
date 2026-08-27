@@ -1,0 +1,311 @@
+{
+  "info": {
+    "name": "iiDENTIFii Forum API v1",
+    "description": "Every endpoint of the forum API. Log in first: the request captures the access token into a collection variable, and every later request sends it automatically.\n\nDefault base URL is http://localhost:5032. Seeded accounts (development only) all use the password `forum-demo-password`:\n\n- `asmith` — ordinary member\n- `bmokoena` — ordinary member\n- `moderator` — moderator, can flag and unflag\n- `dubious` — ordinary member whose post is already flagged\n\nLog in as `asmith` to exercise the member paths, or as `moderator` to exercise flagging. Liking your own post is refused, so like a post authored by someone else.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5032/api/v1" },
+    { "key": "token", "value": "" },
+    { "key": "postId", "value": "" },
+    { "key": "username", "value": "asmith" },
+    { "key": "password", "value": "forum-demo-password" }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('token', pm.response.json().token);",
+                  "  pm.test('registration signs the new member in', () => pm.expect(pm.response.json().token).to.be.a('string'));",
+                  "} else {",
+                  "  pm.test('conflict names neither identifier', () => pm.expect(pm.response.code).to.eql(409));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newcomer@example.com\",\n  \"username\": \"newcomer\",\n  \"password\": \"a-long-enough-password\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] },
+            "description": "Creates an ordinary member and returns an access token. A role can never be requested here. Registration conflicts return 409 with one message that names neither the email nor the username."
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('login succeeds', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('token', body.token);",
+                  "pm.test('token captured', () => pm.expect(body.token).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] },
+            "description": "The identifier may be either the email address or the username, in any case. Failure is identical whether the identifier is unknown or the password is wrong."
+          }
+        },
+        {
+          "name": "My profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] },
+            "description": "The only endpoint that returns an email address, and only the caller's own."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "List posts",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/posts?page=1&pageSize=20&sort=newest",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "20" },
+                { "key": "sort", "value": "newest" },
+                { "key": "from", "value": "2026-05-01T00:00:00Z", "disabled": true },
+                { "key": "to", "value": "2026-05-31T23:59:59Z", "disabled": true },
+                { "key": "author", "value": "asmith", "disabled": true },
+                { "key": "flagged", "value": "true", "disabled": true }
+              ]
+            },
+            "description": "Readable without authenticating. Enable the disabled query parameters to filter by date range, author username or flag state. Sort is one of newest, oldest, most-liked; anything else is refused with 400. pageSize is clamped to 100 server-side."
+          }
+        },
+        {
+          "name": "List posts — flagged only",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/posts?flagged=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts"],
+              "query": [{ "key": "flagged", "value": "true" }]
+            },
+            "description": "A flagged post stays fully readable and reports who flagged it and when."
+          }
+        },
+        {
+          "name": "List posts — most liked",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/posts?sort=most-liked",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts"],
+              "query": [{ "key": "sort", "value": "most-liked" }]
+            }
+          }
+        },
+        {
+          "name": "List posts — rejected sort",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/posts?sort=likeCount",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts"],
+              "query": [{ "key": "sort", "value": "likeCount" }]
+            },
+            "description": "The sort parameter is a closed set, never a column name. Returns 400 with the error attached to the sort field."
+          }
+        },
+        {
+          "name": "Create post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('post created', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('postId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Timeouts on the verification callback\",\n  \"body\": \"Our callback handler occasionally takes longer than the timeout. What is the retry behaviour on your side?\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/posts", "host": ["{{baseUrl}}"], "path": ["posts"] },
+            "description": "Requires a member. Captures the new id into {{postId}} for the requests below."
+          }
+        },
+        {
+          "name": "Read post",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/posts/{{postId}}", "host": ["{{baseUrl}}"], "path": ["posts", "{{postId}}"] },
+            "description": "Returns the post with its first page of comments embedded, so a detail view renders in one request."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Add comment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"We retry twice with a thirty second gap, then fall back to polling.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "{{postId}}", "comments"]
+            }
+          }
+        },
+        {
+          "name": "List comments",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}/comments?page=1&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "{{postId}}", "comments"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "20" }
+              ]
+            },
+            "description": "Oldest first, with a total."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Likes",
+      "item": [
+        {
+          "name": "Like post",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}/like",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "{{postId}}", "like"]
+            },
+            "description": "One like per member per post, enforced by a composite primary key: a second attempt returns 409. Liking your own post returns 403. Set {{postId}} to a post you did not write to see the success path."
+          }
+        },
+        {
+          "name": "Unlike post",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}/like",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "{{postId}}", "like"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Moderation",
+      "item": [
+        {
+          "name": "Flag post",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Contradicts the published integration documentation.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}/flag",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "{{postId}}", "flag"]
+            },
+            "description": "Moderators only. Log in as `moderator` first. An ordinary member receives 403. Flagging annotates: the post stays readable and still accepts comments and likes."
+          }
+        },
+        {
+          "name": "Remove flag",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}/flag",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "{{postId}}", "flag"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "http://localhost:5032/health", "host": ["http://localhost:5032"], "path": ["health"] }
+      }
+    }
+  ]
+}
