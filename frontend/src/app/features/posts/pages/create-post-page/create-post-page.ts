@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
-import { NbButton, NbInput, NbStack, NbTextarea } from '@ng-brutalism/ui';
+import { Router, RouterLink } from '@angular/router';
 import { PostsApi } from '../../data/posts-api';
 import { CreatePostSchema } from '../../data/post.schema';
 import { FieldErrors, toFieldErrors } from '../../../../core/api/parse';
@@ -8,7 +7,7 @@ import { toProblemDetails } from '../../../../core/api/problem-details';
 
 @Component({
   selector: 'app-create-post-page',
-  imports: [NbStack, NbInput, NbTextarea, NbButton],
+  imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './create-post-page.html',
 })

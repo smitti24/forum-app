@@ -1,38 +1,30 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { DatePipe } from '@angular/common';
-import { NbButton, NbCallout, NbSplit } from '@ng-brutalism/ui';
-import { Flag } from '../../../features/posts/data/post.schema';
 
 @Component({
   selector: 'app-moderation-bar',
-  imports: [DatePipe, NbCallout, NbSplit, NbButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (flag(); as current) {
-      <div nbCallout tone="warning" size="sm">
-        <div nbSplit align="center" gap="sm">
-          <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">
-            Flagged as misleading by {{ current.flaggedBy }} ·
-            {{ current.flaggedAt | date: 'short' }}
-          </span>
-          @if (isModerator()) {
-            <button nbButton tone="secondary" size="sm" type="button" (click)="unflag.emit()">
-              Unflag
-            </button>
-          }
-        </div>
-      </div>
-    } @else if (isModerator()) {
-      <button nbButton tone="warning" size="sm" type="button" (click)="flagPost.emit()">
-        Flag as misleading
+    <div
+      class="flex items-center gap-[10px] border-t-2 border-black p-3"
+      style="background: var(--nb-secondary-background)"
+    >
+      <i class="ph-fill ph-shield-check flex-none text-[18px]"></i>
+      <span class="meta flex-1">Moderator</span>
+      <button
+        class="press h-[38px] border-2 border-black px-3 text-[12px] font-bold tracking-[0.04em] uppercase shadow-[3px_3px_0_#000]"
+        [style.background]="isFlagged() ? 'var(--nb-secondary)' : 'var(--nb-warning)'"
+        [disabled]="pending()"
+        type="button"
+        (click)="toggle.emit()"
+      >
+        {{ isFlagged() ? 'Unflag' : 'Flag as misleading' }}
       </button>
-    }
+    </div>
   `,
 })
 export class ModerationBar {
-  readonly flag = input<Flag | null>(null);
-  readonly isModerator = input(false);
+  readonly isFlagged = input(false);
+  readonly pending = input(false);
 
-  readonly flagPost = output<void>();
-  readonly unflag = output<void>();
+  readonly toggle = output<void>();
 }

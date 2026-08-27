@@ -1,24 +1,105 @@
-<div class="min-h-dvh bg-[var(--nb-secondary-background)]">
-  <header nbSurface tone="yellow" shadow="hard" edge="bottom" padding="sm">
-    <div nbSplit align="center" class="mx-auto w-full max-w-[1180px]">
-      <a routerLink="/" class="font-mono text-xl font-bold tracking-[-0.03em] uppercase">Forum</a>
+<div class="flex min-h-dvh flex-col md:flex-row">
+  @if (showNav()) {
+    <nav
+      class="hidden w-[200px] flex-none flex-col gap-2 border-r-2 border-black bg-white p-3 md:flex"
+      aria-label="Sections"
+    >
+      <a routerLink="/" class="mb-4 text-xl font-bold tracking-[-0.03em] uppercase no-underline">
+        Forum
+      </a>
 
-      <nav nbCluster gap="sm" align="center">
+      @for (tab of tabs(); track tab.path) {
+        <a
+          [routerLink]="tab.path"
+          class="flex min-h-[44px] items-center gap-3 border-2 border-black px-3 no-underline"
+          [style.background]="isActive(tab.path) ? 'var(--nb-accent)' : '#fff'"
+          [attr.aria-current]="isActive(tab.path) ? 'page' : null"
+        >
+          <i [class]="tab.icon" class="text-[19px]"></i>
+          <span class="meta">{{ tab.label }}</span>
+        </a>
+      }
+
+      @if (auth.isAuthenticated()) {
+        <a
+          routerLink="/posts/new"
+          class="press mt-2 flex min-h-[44px] items-center justify-center gap-2 border-2 border-black shadow-[4px_4px_0_#000] no-underline"
+          style="background: var(--nb-primary)"
+        >
+          <i class="ph-bold ph-plus text-[19px]"></i>
+          <span class="meta">New post</span>
+        </a>
+      }
+    </nav>
+  }
+
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header
+      class="flex h-[54px] flex-none items-center gap-[10px] border-b-2 border-black px-3"
+      style="background: var(--nb-main)"
+    >
+      @if (canGoBack()) {
+        <button
+          class="flex h-[34px] w-[34px] flex-none items-center justify-center border-2 border-black bg-white md:hidden"
+          type="button"
+          aria-label="Back"
+          (click)="back()"
+        >
+          <i class="ph-bold ph-arrow-left text-[18px]"></i>
+        </button>
+      }
+
+      <span class="text-[15px] font-bold tracking-[-0.01em] uppercase">{{ title() }}</span>
+
+      <div class="ml-auto flex items-center gap-2">
         @if (auth.isAuthenticated()) {
-          <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">
-            {{ auth.member()?.username }}
-          </span>
-          <a nbButton tone="primary" size="sm" routerLink="/posts/new">New post</a>
-          <button nbButton tone="white" size="sm" type="button" (click)="logout()">Sign out</button>
+          <a routerLink="/profile" aria-label="Your profile" class="no-underline">
+            <app-avatar [name]="auth.username()!" [size]="34" />
+          </a>
         } @else {
-          <a nbButton tone="white" size="sm" routerLink="/login" routerLinkActive="font-bold">Sign in</a>
-          <a nbButton tone="primary" size="sm" routerLink="/register">Register</a>
+          <a
+            routerLink="/login"
+            class="flex h-[34px] items-center border-2 border-black bg-white px-[10px] no-underline"
+          >
+            <span class="meta">Sign in</span>
+          </a>
+        }
+      </div>
+    </header>
+
+    <main class="min-h-0 flex-1 overflow-y-auto">
+      <div class="mx-auto w-full max-w-[1180px] p-[14px]">
+        <router-outlet />
+      </div>
+    </main>
+
+    @if (showNav()) {
+      <nav class="flex flex-none border-t-2 border-black bg-white md:hidden" aria-label="Sections">
+        @for (tab of tabs(); track tab.path) {
+          <a
+            [routerLink]="tab.path"
+            class="flex h-[58px] flex-1 flex-col items-center justify-center gap-1 border-r-2 border-black no-underline"
+            [style.background]="isActive(tab.path) ? 'var(--nb-accent)' : '#fff'"
+            [attr.aria-current]="isActive(tab.path) ? 'page' : null"
+          >
+            <i [class]="tab.icon" class="text-[19px]"></i>
+            <span class="font-mono text-[9.5px] font-bold uppercase">{{ tab.label }}</span>
+          </a>
+        }
+
+        @if (auth.isAuthenticated()) {
+          <div class="flex h-[58px] flex-1 items-center justify-center">
+            <a
+              routerLink="/posts/new"
+              class="press flex h-10 w-10 items-center justify-center border-2 border-black shadow-[3px_3px_0_#000] no-underline"
+              style="background: var(--nb-primary)"
+              aria-label="New post"
+            >
+              <i class="ph-bold ph-plus text-[19px]"></i>
+            </a>
+          </div>
         }
       </nav>
-    </div>
-  </header>
-
-  <main class="mx-auto w-full max-w-[1180px] p-4">
-    <router-outlet />
-  </main>
+    }
+  </div>
 </div>

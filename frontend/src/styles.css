@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 @import '@ng-brutalism/ui/styles.css';
+@import '@phosphor-icons/web/bold';
+@import '@phosphor-icons/web/fill';
 
 :root {
   --nb-primary: #ff90e8;
@@ -12,6 +14,50 @@
   --nb-field-bg: #faf3d6;
   --nb-surface: #ffffff;
   --nb-secondary-background: oklch(96% 0 0);
+  --nb-border: #000000;
+  --nb-shadow: #000000;
   --nb-radius: 0rem;
   --nb-border-width: 2px;
+  --nb-font-sans: system-ui, sans-serif;
+  --nb-font-mono: ui-monospace, SFMono-Regular, monospace;
+}
+
+body {
+  margin: 0;
+  background: var(--nb-secondary-background);
+  color: #000;
+  font-family: var(--nb-font-sans);
+  font-weight: 500;
+}
+
+a {
+  color: #000;
+}
+
+*:focus-visible {
+  outline: 3px solid #000;
+  outline-offset: 2px;
+}
+
+@keyframes nbshimmer {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+@utility meta {
+  font-family: var(--nb-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+@utility press {
+  transition: transform 80ms, box-shadow 80ms;
+
+  &:active:not(:disabled) {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+  }
 }

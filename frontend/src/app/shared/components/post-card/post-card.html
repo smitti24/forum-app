@@ -1,42 +1,76 @@
-<article nbSurface shadow="default" padding="none" [class.opacity-80]="post().flag">
-  <div nbCluster align="center" gap="sm" padding="sm">
-    <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">
-      {{ post().author.username }}
-    </span>
-    <span class="font-mono text-[11px] font-medium tracking-[0.06em] uppercase opacity-70">
-      {{ post().createdAt | date: 'short' }}
-    </span>
-  </div>
-
-  @if (post().flag || isModerator()) {
-    <div class="border-t-2 border-black p-3">
-      <app-moderation-bar
-        [flag]="post().flag"
-        [isModerator]="isModerator()"
-        (flagPost)="flagPost.emit()"
-        (unflag)="unflag.emit()"
-      />
+<article class="border-2 border-black bg-white shadow-[4px_4px_0_#000]">
+  @if (post().flag; as flag) {
+    <div
+      class="flex items-center gap-2 border-b-2 border-black px-3 py-[9px]"
+      style="background: var(--nb-warning)"
+    >
+      <i class="ph-fill ph-warning flex-none text-[16px]"></i>
+      <span class="text-[12px] font-bold tracking-[0.03em] uppercase">
+        Flagged as misleading by {{ flag.flaggedBy }}
+      </span>
     </div>
   }
 
-  <div nbStack gap="sm" class="border-t-2 border-black p-3">
-    @if (linkToDetail()) {
-      <a [routerLink]="['/posts', post().id]" class="text-[18px] font-bold">{{ post().title }}</a>
-    } @else {
-      <h1 class="text-[18px] font-bold">{{ post().title }}</h1>
+  <div class="flex items-center gap-[10px] border-b-2 border-black p-3">
+    <app-avatar [name]="post().author.username" />
+
+    <div class="min-w-0 flex-1">
+      <div class="text-[14px] font-bold">{{ post().author.username }}</div>
+      <div class="meta mt-[2px]">{{ post().createdAt | date: 'd MMM y, HH:mm' }}</div>
+    </div>
+
+    @if (isMine()) {
+      <span
+        class="border-2 border-black px-[7px] py-[3px] font-mono text-[9.5px] font-bold uppercase"
+        style="background: var(--nb-secondary)"
+      >
+        You
+      </span>
     }
-    <p class="text-[15px] font-medium whitespace-pre-line">{{ post().body }}</p>
   </div>
 
-  <div nbSplit align="center" padding="sm" class="border-t-2 border-black">
+  <div class="flex flex-col gap-[10px] p-3">
+    @if (dense()) {
+      <a
+        [routerLink]="['/posts', post().id]"
+        class="text-[18px] leading-[1.2] font-bold tracking-[-0.01em] no-underline"
+      >
+        {{ post().title }}
+      </a>
+    } @else {
+      <h1 class="text-[21px] leading-[1.15] font-bold tracking-[-0.02em]">{{ post().title }}</h1>
+    }
+
+    <p class="text-[15px] leading-[1.5] whitespace-pre-line" [class.line-clamp-3]="dense()">
+      {{ post().body }}
+    </p>
+  </div>
+
+  <div class="flex items-stretch border-t-2 border-black">
     <app-like-button
       [post]="post()"
       [isAuthenticated]="isAuthenticated()"
-      [currentMemberId]="currentMemberId()"
+      [isMine]="isMine()"
       (toggle)="toggleLike.emit()"
     />
-    <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">
-      {{ post().commentCount }} comments
-    </span>
+
+    @if (dense()) {
+      <a
+        [routerLink]="['/posts', post().id]"
+        class="flex h-[46px] flex-1 items-center justify-center gap-[7px] border-r-2 border-black bg-white text-[13px] font-bold tracking-[0.04em] uppercase no-underline"
+      >
+        <i class="ph-bold ph-chat-circle text-[18px]"></i>
+        {{ post().commentCount }}
+      </a>
+    } @else {
+      <span
+        class="flex h-[46px] flex-1 items-center justify-center gap-[7px] bg-white text-[13px] font-bold tracking-[0.04em] uppercase"
+      >
+        <i class="ph-bold ph-chat-circle text-[18px]"></i>
+        {{ post().commentCount }}
+      </span>
+    }
   </div>
+
+  <ng-content />
 </article>

@@ -1,50 +1,90 @@
-<div class="flex flex-col gap-4">
-  <app-filter-bar
-    [filters]="filters()"
-    [total]="posts.value()?.total ?? 0"
-    (filtersChange)="patchFilters($event)"
-    (clear)="clearFilters()"
-  />
+<div class="flex flex-col gap-[14px]">
+  <div class="flex border-2 border-black bg-white shadow-[4px_4px_0_#000]">
+    @for (sort of sorts; track sort.key) {
+      <button
+        class="h-[44px] flex-1 border-r-2 border-black text-[13px] font-bold tracking-[0.04em] uppercase last:border-r-0"
+        [style.background]="filters().sort === sort.key ? 'var(--nb-accent)' : '#fff'"
+        [attr.aria-pressed]="filters().sort === sort.key"
+        type="button"
+        (click)="patch({ sort: sort.key, page: 1 })"
+      >
+        {{ sort.label }}
+      </button>
+    }
+    <button
+      class="flex h-[44px] w-[52px] items-center justify-center border-l-2 border-black bg-white"
+      type="button"
+      aria-label="Filter posts"
+      (click)="sheetOpen.set(true)"
+    >
+      <i class="ph-bold ph-sliders-horizontal text-[17px]"></i>
+      @if (activeFilterCount() > 0) {
+        <span class="ml-1 font-mono text-[11px] font-bold">{{ activeFilterCount() }}</span>
+      }
+    </button>
+  </div>
+
+  @if (!auth.isAuthenticated()) {
+    <div
+      class="flex items-center gap-[9px] border-2 border-black px-3 py-[11px] shadow-[4px_4px_0_#000]"
+      style="background: var(--nb-secondary-background)"
+    >
+      <i class="ph-bold ph-eye-slash flex-none text-[17px]"></i>
+      <span class="text-[13px] leading-[1.4] font-bold">
+        Reading as a visitor. Sign in to like or post.
+      </span>
+    </div>
+  }
 
   @if (posts.isLoading()) {
-    <app-skeleton-list [count]="5" />
+    <app-skeleton-list [count]="4" />
   } @else if (posts.error()) {
-    <app-error-state (retry)="posts.reload()" />
+    <app-error-state headline="Feed failed" (retry)="posts.reload()" />
   } @else if (posts.hasValue()) {
     @let page = posts.value()!;
 
     @if (page.items.length === 0) {
-      <app-empty-state headline="No posts yet" message="Nothing matches these filters." />
+      <app-empty-state
+        headline="Nothing here"
+        message="No posts match this filter. Widen the range or clear the filters."
+      >
+        @if (activeFilterCount() > 0) {
+          <button
+            class="press h-[42px] border-2 border-black bg-white px-[14px] text-[12px] font-bold tracking-[0.04em] uppercase shadow-[3px_3px_0_#000]"
+            type="button"
+            (click)="clearFilters()"
+          >
+            Clear filters
+          </button>
+        }
+      </app-empty-state>
     } @else {
       @for (post of page.items; track post.id) {
         <app-post-card
           [post]="post"
           [isAuthenticated]="auth.isAuthenticated()"
-          [isModerator]="auth.isModerator()"
           [currentMemberId]="auth.memberId()"
           (toggleLike)="toggleLike(post.id, post.likedByCurrentMember)"
-          (flagPost)="toggleFlag(post.id, false)"
-          (unflag)="toggleFlag(post.id, true)"
         />
       }
 
-      <div class="flex items-center justify-between border-2 border-black bg-white p-3">
+      <div
+        class="flex items-center justify-between border-2 border-black bg-white p-3 shadow-[4px_4px_0_#000]"
+      >
         <button
-          class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase disabled:opacity-45"
+          class="meta min-h-[44px] disabled:opacity-45"
           type="button"
           [disabled]="page.page <= 1"
-          (click)="patchFilters({ page: page.page - 1 })"
+          (click)="patch({ page: page.page - 1 })"
         >
           Previous
         </button>
-        <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">
-          Page {{ page.page }} · {{ page.total }} total
-        </span>
+        <span class="meta">Page {{ page.page }} · {{ page.total }} posts</span>
         <button
-          class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase disabled:opacity-45"
+          class="meta min-h-[44px] disabled:opacity-45"
           type="button"
           [disabled]="page.page * page.pageSize >= page.total"
-          (click)="patchFilters({ page: page.page + 1 })"
+          (click)="patch({ page: page.page + 1 })"
         >
           Next
         </button>
@@ -52,3 +92,12 @@
     }
   }
 </div>
+
+@if (sheetOpen()) {
+  <app-filter-sheet
+    [filters]="filters()"
+    [total]="total()"
+    (apply)="applyFilters($event)"
+    (close)="sheetOpen.set(false)"
+  />
+}

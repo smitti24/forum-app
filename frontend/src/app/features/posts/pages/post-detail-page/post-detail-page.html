@@ -1,49 +1,79 @@
 @if (post.isLoading()) {
-  <app-skeleton-list [count]="3" />
+  <app-skeleton-list [count]="2" />
 } @else if (post.error()) {
-  <app-error-state (retry)="post.reload()" />
+  <app-error-state headline="Post failed" (retry)="post.reload()" />
 } @else if (post.hasValue()) {
   @let detail = post.value()!;
 
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-[14px]">
     <app-post-card
       [post]="detail"
-      [linkToDetail]="false"
+      [dense]="false"
       [isAuthenticated]="auth.isAuthenticated()"
-      [isModerator]="auth.isModerator()"
       [currentMemberId]="auth.memberId()"
       (toggleLike)="toggleLike(detail.likedByCurrentMember)"
-      (flagPost)="toggleFlag(false)"
-      (unflag)="toggleFlag(true)"
-    />
-
-    <h2 class="font-mono text-[12px] font-bold tracking-[0.06em] uppercase">
-      {{ detail.comments.total }} comments
-    </h2>
-
-    @if (auth.isAuthenticated()) {
-      <form class="flex flex-col gap-2" (submit)="$event.preventDefault(); addComment()">
-        <textarea
-          nbTextarea
-          rows="3"
-          aria-label="Write a comment"
-          [value]="draft()"
-          (input)="draft.set($any($event.target).value)"
-        ></textarea>
-        <button nbButton tone="primary" type="submit" [disabled]="submitting() || !draft().trim()">
-          Comment
-        </button>
-      </form>
-    } @else {
-      <app-empty-state headline="Sign in to comment" message="Visitors can read every discussion." />
-    }
-
-    @if (detail.comments.items.length === 0) {
-      <app-empty-state headline="No comments yet" message="Be the first to reply." />
-    } @else {
-      @for (comment of detail.comments.items; track comment.id) {
-        <app-comment-item [comment]="comment" />
+    >
+      @if (auth.isModerator()) {
+        <app-moderation-bar
+          [isFlagged]="detail.flag !== null"
+          [pending]="flagPending()"
+          (toggle)="toggleFlag(detail.flag !== null)"
+        />
       }
-    }
+    </app-post-card>
+
+    <div class="meta mt-1">
+      {{ detail.comments.total }} {{ detail.comments.total === 1 ? 'comment' : 'comments' }}
+    </div>
+
+    <div class="border-2 border-black bg-white shadow-[4px_4px_0_#000]">
+      @if (detail.comments.items.length === 0) {
+        <div class="p-3 text-[14px] leading-[1.5]">
+          No comments yet. Be the first to reply.
+        </div>
+      } @else {
+        @for (comment of detail.comments.items; track comment.id; let first = $first) {
+          <app-comment-item
+            [comment]="comment"
+            [first]="first"
+            [isAuthor]="comment.author.id === detail.author.id"
+          />
+        }
+      }
+
+      <div class="flex gap-[9px] border-t-2 border-black p-3">
+        @if (auth.isAuthenticated()) {
+          <input
+            type="text"
+            class="h-[44px] min-w-0 flex-1 border-2 border-black px-3 text-[15px] font-medium"
+            style="background: var(--nb-field-bg)"
+            placeholder="Add a comment"
+            aria-label="Add a comment"
+            [value]="draft()"
+            (input)="draft.set($any($event.target).value)"
+            (keydown.enter)="addComment()"
+          />
+          <button
+            class="press flex h-[44px] w-[52px] flex-none items-center justify-center border-2 border-black shadow-[3px_3px_0_#000] disabled:opacity-45"
+            style="background: var(--nb-primary)"
+            type="button"
+            aria-label="Send comment"
+            [disabled]="submitting() || !draft().trim()"
+            (click)="addComment()"
+          >
+            <i class="ph-bold ph-paper-plane-right text-[18px]"></i>
+          </button>
+        } @else {
+          <a
+            routerLink="/login"
+            class="flex h-[44px] flex-1 items-center justify-center border-2 border-dashed border-black bg-white text-[13px] font-bold uppercase no-underline"
+          >
+            Sign in to comment
+          </a>
+        }
+      </div>
+    </div>
   </div>
+} @else {
+  <app-empty-state headline="Post not found" icon="ph-bold ph-file-x" />
 }

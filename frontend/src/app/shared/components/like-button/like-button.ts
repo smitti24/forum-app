@@ -1,48 +1,61 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { NbButton } from '@ng-brutalism/ui';
 import { Post } from '../../../features/posts/data/post.schema';
 
-type LikeDisabledReason = 'guest' | 'own-post' | null;
+type LikeState = 'guest' | 'own-post' | 'liked' | 'rest';
 
 @Component({
   selector: 'app-like-button',
-  imports: [NbButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <button
-      nbButton
-      size="sm"
-      [tone]="post().likedByCurrentMember ? 'primary' : 'white'"
-      [disabled]="reason() === 'own-post'"
+      class="flex h-[46px] flex-1 items-center justify-center gap-[7px] border-r-2 border-black text-[13px] font-bold tracking-[0.04em] uppercase"
+      [style.background]="state() === 'liked' ? 'var(--nb-primary)' : '#fff'"
+      [class.opacity-45]="state() === 'own-post'"
+      [class.cursor-not-allowed]="state() === 'own-post'"
+      [class.border-dashed]="state() === 'guest'"
+      [disabled]="state() === 'own-post'"
       [attr.aria-label]="label()"
-      [attr.aria-pressed]="post().likedByCurrentMember"
-      [class.opacity-45]="reason() === 'own-post'"
-      [class.border-dashed]="reason() === 'guest'"
+      [attr.aria-pressed]="state() === 'liked'"
       type="button"
       (click)="toggle.emit()"
     >
-      {{ reason() === 'guest' ? 'Sign in' : post().likeCount }}
+      <i
+        class="text-[18px]"
+        [class.ph-fill]="state() === 'liked'"
+        [class.ph-bold]="state() !== 'liked'"
+        [class.ph-heart]="true"
+      ></i>
+      @if (state() === 'guest') {
+        Sign in
+      } @else {
+        <span class="tabular-nums">{{ post().likeCount }}</span>
+      }
     </button>
   `,
 })
 export class LikeButton {
   readonly post = input.required<Post>();
   readonly isAuthenticated = input(false);
-  readonly currentMemberId = input<string | null>(null);
+  readonly isMine = input(false);
 
   readonly toggle = output<void>();
 
-  protected readonly reason = computed<LikeDisabledReason>(() => {
+  protected readonly state = computed<LikeState>(() => {
     if (!this.isAuthenticated()) return 'guest';
-    if (this.post().author.id === this.currentMemberId()) return 'own-post';
-    return null;
+    if (this.isMine()) return 'own-post';
+    return this.post().likedByCurrentMember ? 'liked' : 'rest';
   });
 
-  protected readonly label = computed(() =>
-    this.reason() === 'own-post'
-      ? 'You cannot like your own post'
-      : this.post().likedByCurrentMember
-        ? 'Remove your like'
-        : 'Like this post',
-  );
+  protected readonly label = computed(() => {
+    switch (this.state()) {
+      case 'guest':
+        return 'Sign in to like this post';
+      case 'own-post':
+        return 'You cannot like your own post';
+      case 'liked':
+        return 'Remove your like';
+      default:
+        return 'Like this post';
+    }
+  });
 }

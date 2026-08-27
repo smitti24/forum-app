@@ -1,0 +1,99 @@
+<div
+  class="fixed inset-0 z-50 flex items-end bg-black/45"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Filter posts"
+  (click)="close.emit()"
+>
+  <div class="w-full border-t-[3px] border-black bg-white" (click)="$event.stopPropagation()">
+    <div
+      class="flex items-center justify-between border-b-2 border-black px-[14px] py-[11px]"
+      style="background: var(--nb-accent)"
+    >
+      <span class="text-[14px] font-bold tracking-[0.06em] uppercase">Filter</span>
+      <div class="flex gap-2">
+        <button
+          class="h-8 border-2 border-black bg-white px-[10px] font-mono text-[11px] font-bold uppercase"
+          type="button"
+          (click)="reset()"
+        >
+          Reset
+        </button>
+        <button
+          class="flex h-8 w-8 items-center justify-center border-2 border-black bg-white"
+          type="button"
+          aria-label="Close filters"
+          (click)="close.emit()"
+        >
+          <i class="ph-bold ph-x text-[15px]"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="mx-auto flex max-w-[1180px] flex-col gap-4 p-[14px]">
+      <label class="flex flex-col gap-[7px]">
+        <span class="meta">Author</span>
+        <input
+          type="text"
+          placeholder="Username"
+          class="h-[44px] border-2 border-black px-3 text-[15px] font-medium"
+          style="background: var(--nb-field-bg)"
+          [value]="author()"
+          (input)="author.set($any($event.target).value)"
+        />
+      </label>
+
+      <div class="flex gap-3">
+        <label class="flex flex-1 flex-col gap-[7px]">
+          <span class="meta">From</span>
+          <input
+            type="date"
+            class="h-[44px] border-2 border-black px-3 text-[15px] font-medium"
+            style="background: var(--nb-field-bg)"
+            [value]="from()"
+            (input)="from.set($any($event.target).value)"
+          />
+        </label>
+        <label class="flex flex-1 flex-col gap-[7px]">
+          <span class="meta">To</span>
+          <input
+            type="date"
+            class="h-[44px] border-2 border-black px-3 text-[15px] font-medium"
+            style="background: var(--nb-field-bg)"
+            [value]="to()"
+            (input)="to.set($any($event.target).value)"
+          />
+        </label>
+      </div>
+
+      <div>
+        <div class="meta mb-[9px]">Flag state</div>
+        <div class="flex flex-wrap gap-2">
+          @for (option of [{ label: 'Any', value: null }, { label: 'Flagged only', value: true }, { label: 'Not flagged', value: false }]; track option.label) {
+            <button
+              class="min-h-[44px] border-2 border-black px-3 text-[13px] font-bold uppercase"
+              [style.background]="flagged() === option.value ? 'var(--nb-accent)' : '#fff'"
+              [attr.aria-pressed]="flagged() === option.value"
+              type="button"
+              (click)="flagged.set(option.value)"
+            >
+              {{ option.label }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <button
+        class="press h-[48px] border-2 border-black text-[14px] font-bold tracking-[0.06em] uppercase shadow-[4px_4px_0_#000]"
+        style="background: var(--nb-primary)"
+        type="button"
+        (click)="submit()"
+      >
+        Show {{ total() }} results
+        @if (activeCount() > 0) {
+          · {{ activeCount() }} filters
+        }
+      </button>
+    </div>
+  </div>
+</div>

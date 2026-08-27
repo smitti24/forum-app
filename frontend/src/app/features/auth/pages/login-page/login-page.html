@@ -1,28 +1,79 @@
-<form nbStack gap="md" class="mx-auto max-w-md border-2 border-black bg-white p-4"
-      (submit)="$event.preventDefault(); submit()">
-  <h1 class="text-[30px] font-bold tracking-[-0.03em] uppercase">Sign in</h1>
+<form
+  class="mx-auto flex max-w-md flex-col gap-[18px] py-2"
+  (submit)="$event.preventDefault(); submit()"
+>
+  <div
+    class="border-2 border-black p-[18px] shadow-[4px_4px_0_#000]"
+    style="background: var(--nb-primary)"
+  >
+    <div class="meta mb-2 tracking-[0.12em]">iiDENTIFii</div>
+    <div class="text-[26px] leading-none font-bold tracking-[-0.02em] uppercase">Welcome back</div>
+  </div>
 
-  <label class="flex flex-col gap-1">
-    <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">Username or email</span>
-    <input nbInput type="text" autocomplete="username"
-           [value]="identifier()" (input)="identifier.set($any($event.target).value)" />
+  <label class="flex flex-col gap-[7px]">
+    <span class="meta">Username or email</span>
+    <input
+      type="text"
+      autocomplete="username"
+      class="h-[46px] border-2 border-black px-3 text-[15px] font-medium"
+      style="background: var(--nb-field-bg)"
+      [style.border-width.px]="errors()['identifier'] ? 3 : 2"
+      [style.border-color]="errors()['identifier'] ? 'var(--nb-danger)' : '#000'"
+      [value]="identifier()"
+      (input)="identifier.set($any($event.target).value)"
+    />
     @for (message of errors()['identifier'] ?? []; track message) {
-      <span class="text-[13px] font-medium text-[var(--nb-danger)]">{{ message }}</span>
+      <span class="text-[13px] font-bold" style="color: var(--nb-danger)">{{ message }}</span>
     }
   </label>
 
-  <label class="flex flex-col gap-1">
-    <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">Password</span>
-    <input nbInput type="password" autocomplete="current-password"
-           [value]="password()" (input)="password.set($any($event.target).value)" />
+  <label class="flex flex-col gap-[7px]">
+    <span class="meta">Password</span>
+    <input
+      type="password"
+      autocomplete="current-password"
+      class="h-[46px] border-2 border-black px-3 text-[15px] font-medium"
+      style="background: var(--nb-field-bg)"
+      [style.border-width.px]="errors()['password'] ? 3 : 2"
+      [style.border-color]="errors()['password'] ? 'var(--nb-danger)' : '#000'"
+      [value]="password()"
+      (input)="password.set($any($event.target).value)"
+    />
     @for (message of errors()['password'] ?? []; track message) {
-      <span class="text-[13px] font-medium text-[var(--nb-danger)]">{{ message }}</span>
+      <span class="text-[13px] font-bold" style="color: var(--nb-danger)">{{ message }}</span>
     }
   </label>
 
   @for (message of errors()['form'] ?? []; track message) {
-    <span class="text-[13px] font-medium text-[var(--nb-danger)]">{{ message }}</span>
+    <div
+      class="flex items-center gap-2 border-2 border-black p-3 text-[13px] font-bold"
+      style="background: var(--nb-danger)"
+      role="alert"
+    >
+      <i class="ph-fill ph-warning flex-none text-[16px]"></i>
+      {{ message }}
+    </div>
   }
 
-  <button nbButton tone="primary" type="submit" [disabled]="submitting()">Sign in</button>
+  <button
+    class="press h-[50px] border-2 border-black text-[15px] font-bold tracking-[0.06em] uppercase shadow-[4px_4px_0_#000] disabled:opacity-45"
+    style="background: var(--nb-primary)"
+    type="submit"
+    [disabled]="submitting()"
+  >
+    {{ submitting() ? 'Signing in…' : 'Sign in' }}
+  </button>
+
+  <div class="h-[2px] bg-black"></div>
+
+  <a
+    routerLink="/"
+    class="flex h-[46px] items-center justify-center border-2 border-dashed border-black bg-white text-[13px] font-bold tracking-[0.04em] uppercase no-underline"
+  >
+    Browse without an account
+  </a>
+
+  <a routerLink="/register" class="py-[6px] text-center text-[13px] font-bold">
+    No account? Register
+  </a>
 </form>

@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
-import { NbButton, NbInput, NbStack } from '@ng-brutalism/ui';
+import { Router, RouterLink } from '@angular/router';
 import { AuthApi } from '../../data/auth-api';
 import { LoginSchema } from '../../data/auth.schema';
 import { FieldErrors, toFieldErrors } from '../../../../core/api/parse';
 
 @Component({
   selector: 'app-login-page',
-  imports: [NbStack, NbInput, NbButton],
+  imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login-page.html',
 })

@@ -1,25 +1,63 @@
-<form nbStack gap="md" class="border-2 border-black bg-white p-4" (submit)="$event.preventDefault(); submit()">
-  <h1 class="text-[30px] font-bold tracking-[-0.03em] uppercase">New post</h1>
-
-  <label class="flex flex-col gap-1">
-    <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">Title</span>
-    <input nbInput type="text" [value]="title()" (input)="title.set($any($event.target).value)" />
+<form class="flex flex-col gap-4 py-2" (submit)="$event.preventDefault(); submit()">
+  <label class="flex flex-col gap-[7px]">
+    <span class="meta">Title</span>
+    <input
+      type="text"
+      placeholder="What's the question?"
+      class="h-[46px] border-2 border-black px-3 text-[15px] font-medium"
+      style="background: var(--nb-field-bg)"
+      [style.border-width.px]="errors()['title'] ? 3 : 2"
+      [style.border-color]="errors()['title'] ? 'var(--nb-danger)' : '#000'"
+      [value]="title()"
+      (input)="title.set($any($event.target).value)"
+    />
     @for (message of errors()['title'] ?? []; track message) {
-      <span class="text-[13px] font-medium text-[var(--nb-danger)]">{{ message }}</span>
+      <span class="text-[13px] font-bold" style="color: var(--nb-danger)">{{ message }}</span>
     }
   </label>
 
-  <label class="flex flex-col gap-1">
-    <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">Body</span>
-    <textarea nbTextarea rows="8" [value]="body()" (input)="body.set($any($event.target).value)"></textarea>
+  <label class="flex flex-col gap-[7px]">
+    <span class="meta">Body</span>
+    <textarea
+      rows="8"
+      placeholder="Context, error text, the request you sent."
+      class="resize-y border-2 border-black px-3 py-[10px] text-[15px] font-medium"
+      style="background: var(--nb-field-bg)"
+      [style.border-width.px]="errors()['body'] ? 3 : 2"
+      [style.border-color]="errors()['body'] ? 'var(--nb-danger)' : '#000'"
+      [value]="body()"
+      (input)="body.set($any($event.target).value)"
+    ></textarea>
     @for (message of errors()['body'] ?? []; track message) {
-      <span class="text-[13px] font-medium text-[var(--nb-danger)]">{{ message }}</span>
+      <span class="text-[13px] font-bold" style="color: var(--nb-danger)">{{ message }}</span>
     }
   </label>
 
   @for (message of errors()['form'] ?? []; track message) {
-    <span class="text-[13px] font-medium text-[var(--nb-danger)]">{{ message }}</span>
+    <div
+      class="flex items-center gap-2 border-2 border-black p-3 text-[13px] font-bold"
+      style="background: var(--nb-danger)"
+      role="alert"
+    >
+      <i class="ph-fill ph-warning flex-none text-[16px]"></i>
+      {{ message }}
+    </div>
   }
 
-  <button nbButton tone="primary" type="submit" [disabled]="submitting()">Post</button>
+  <div class="flex gap-[10px]">
+    <button
+      class="press h-[50px] flex-1 border-2 border-black text-[14px] font-bold tracking-[0.06em] uppercase shadow-[4px_4px_0_#000] disabled:opacity-45"
+      style="background: var(--nb-primary)"
+      type="submit"
+      [disabled]="submitting()"
+    >
+      {{ submitting() ? 'Publishing…' : 'Publish' }}
+    </button>
+    <a
+      routerLink="/"
+      class="flex h-[50px] w-[100px] items-center justify-center border-2 border-black bg-white text-[13px] font-bold tracking-[0.04em] uppercase shadow-[4px_4px_0_#000] no-underline"
+    >
+      Cancel
+    </a>
+  </div>
 </form>
