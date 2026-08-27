@@ -10,6 +10,7 @@ import {
   PagedCommentsSchema,
   PagedPostsSchema,
   PostFilters,
+  PostDetailSchema,
   PostSchema,
 } from './post.schema';
 
@@ -44,7 +45,7 @@ export class PostsApi {
         const id = postId();
         return id ? `${this.baseUrl}/posts/${id}` : undefined;
       },
-      { parse: parseWith(PostSchema) },
+      { parse: parseWith(PostDetailSchema) },
     );
   }
 

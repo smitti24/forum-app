@@ -21,10 +21,8 @@ export class PostDetailPage {
   readonly id = input.required<string>();
 
   private readonly postId = computed(() => this.id());
-  protected readonly commentPage = signal(1);
 
   protected readonly post = this.api.postResource(this.postId);
-  protected readonly comments = this.api.commentsResource(this.postId, this.commentPage);
 
   protected readonly draft = signal('');
   protected readonly submitting = signal(false);
@@ -37,7 +35,6 @@ export class PostDetailPage {
     try {
       await this.api.createComment(this.id(), { body });
       this.draft.set('');
-      this.comments.reload();
       this.post.reload();
     } finally {
       this.submitting.set(false);

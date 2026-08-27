@@ -36,6 +36,11 @@ export type Comment = z.infer<typeof CommentSchema>;
 export const PagedPostsSchema = paged(PostSchema);
 export const PagedCommentsSchema = paged(CommentSchema);
 
+export const PostDetailSchema = PostSchema.extend({
+  comments: PagedCommentsSchema,
+});
+export type PostDetail = z.infer<typeof PostDetailSchema>;
+
 export const SortSchema = z.enum(['newest', 'oldest', 'most-liked']);
 export type Sort = z.infer<typeof SortSchema>;
 

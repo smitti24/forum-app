@@ -1,6 +1,6 @@
 import { MemberSchema, RoleSchema } from '../auth/member.schema';
 import { AuthResponseSchema } from '../../features/auth/data/auth.schema';
-import { PostSchema } from '../../features/posts/data/post.schema';
+import { PostDetailSchema, PostSchema } from '../../features/posts/data/post.schema';
 
 const member = {
   id: '0198f2c1-4a3b-7c8d-9e0f-1a2b3c4d5e6f',
@@ -61,6 +61,36 @@ describe('the API contract', () => {
     });
 
     expect(parsed.flag?.flaggedBy).toBe('moderator1');
+  });
+
+  it('accepts a post detail with its first page of comments embedded', () => {
+    const parsed = PostDetailSchema.parse({
+      id: '0198f2c1-4a3b-7c8d-9e0f-1a2b3c4d5e72',
+      title: 'Integrating the SDK',
+      body: 'Body text.',
+      author: { id: member.id, username: member.username },
+      createdAt: '2026-08-27T06:31:46Z',
+      likeCount: 0,
+      commentCount: 1,
+      likedByCurrentMember: false,
+      flag: null,
+      comments: {
+        items: [
+          {
+            id: '0198f2c1-4a3b-7c8d-9e0f-1a2b3c4d5e73',
+            postId: '0198f2c1-4a3b-7c8d-9e0f-1a2b3c4d5e72',
+            author: { id: member.id, username: member.username },
+            body: 'A reply.',
+            createdAt: '2026-08-27T06:32:00Z',
+          },
+        ],
+        page: 1,
+        pageSize: 20,
+        total: 1,
+      },
+    });
+
+    expect(parsed.comments.total).toBe(1);
   });
 
   it('rejects a timestamp with no timezone, which would mean a lost UTC marker', () => {
