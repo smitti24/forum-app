@@ -29,13 +29,13 @@ export class FeedPage {
     this.filters.set(DEFAULT_FILTERS);
   }
 
-  protected async like(postId: string): Promise<void> {
-    await this.api.like(postId);
+  protected async toggleLike(postId: string, liked: boolean): Promise<void> {
+    await (liked ? this.api.unlike(postId) : this.api.like(postId));
     this.posts.reload();
   }
 
-  protected async setFlag(postId: string, isFlagged: boolean): Promise<void> {
-    await (isFlagged ? this.api.unflag(postId) : this.api.flag(postId));
+  protected async toggleFlag(postId: string, flagged: boolean): Promise<void> {
+    await (flagged ? this.api.unflag(postId) : this.api.flag(postId));
     this.posts.reload();
   }
 }

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { RoleSchema, TimestampSchema } from '../../../core/auth/member.schema';
+import { MemberSchema, TimestampSchema } from '../../../core/auth/member.schema';
 
 export const MIN_PASSWORD_LENGTH = 12;
 export const USERNAME_PATTERN = /^[A-Za-z0-9._-]{3,32}$/;
@@ -21,15 +21,9 @@ export const RegisterSchema = z.object({
 });
 export type Register = z.infer<typeof RegisterSchema>;
 
-export const TokenResponseSchema = z.object({
-  accessToken: z.string().min(1),
+export const AuthResponseSchema = z.object({
+  token: z.string().min(1),
   expiresAt: TimestampSchema,
-  username: z.string().min(1),
-  role: RoleSchema,
+  member: MemberSchema,
 });
-export type TokenResponse = z.infer<typeof TokenResponseSchema>;
-
-export const RegisteredResponseSchema = z.object({
-  id: z.uuid(),
-  username: z.string().min(1),
-});
+export type AuthResponse = z.infer<typeof AuthResponseSchema>;

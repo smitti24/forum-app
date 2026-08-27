@@ -11,10 +11,10 @@
       [linkToDetail]="false"
       [isAuthenticated]="auth.isAuthenticated()"
       [isModerator]="auth.isModerator()"
-      [currentUsername]="auth.username()"
-      (toggleLike)="like()"
-      (flagPost)="setFlag(detail.isFlagged)"
-      (unflag)="setFlag(detail.isFlagged)"
+      [currentMemberId]="auth.memberId()"
+      (toggleLike)="toggleLike(detail.likedByCurrentMember)"
+      (flagPost)="toggleFlag(false)"
+      (unflag)="toggleFlag(true)"
     />
 
     <h2 class="font-mono text-[12px] font-bold tracking-[0.06em] uppercase">

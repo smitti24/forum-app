@@ -1,26 +1,33 @@
 import { z } from 'zod';
-import { TimestampSchema } from '../../../core/auth/member.schema';
+import { AuthorSchema, TimestampSchema } from '../../../core/auth/member.schema';
 import { paged } from '../../../core/api/paged';
 
 export const MAX_TITLE_LENGTH = 200;
 export const MAX_BODY_LENGTH = 10_000;
 
+export const FlagSchema = z.object({
+  flaggedBy: z.string().min(1),
+  flaggedAt: TimestampSchema,
+});
+export type Flag = z.infer<typeof FlagSchema>;
+
 export const PostSchema = z.object({
   id: z.uuid(),
   title: z.string().min(1),
   body: z.string(),
-  author: z.string().min(1),
+  author: AuthorSchema,
   createdAt: TimestampSchema,
-  isFlagged: z.boolean(),
   likeCount: z.number().int().nonnegative(),
   commentCount: z.number().int().nonnegative(),
+  likedByCurrentMember: z.boolean(),
+  flag: FlagSchema.nullable(),
 });
 export type Post = z.infer<typeof PostSchema>;
 
 export const CommentSchema = z.object({
   id: z.uuid(),
   postId: z.uuid(),
-  author: z.string().min(1),
+  author: AuthorSchema,
   body: z.string().min(1),
   createdAt: TimestampSchema,
 });

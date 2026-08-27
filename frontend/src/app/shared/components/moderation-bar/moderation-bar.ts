@@ -1,16 +1,19 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { NbButton, NbCallout, NbSplit } from '@ng-brutalism/ui';
+import { Flag } from '../../../features/posts/data/post.schema';
 
 @Component({
   selector: 'app-moderation-bar',
-  imports: [NbCallout, NbSplit, NbButton],
+  imports: [DatePipe, NbCallout, NbSplit, NbButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (isFlagged()) {
+    @if (flag(); as current) {
       <div nbCallout tone="warning" size="sm">
         <div nbSplit align="center" gap="sm">
           <span class="font-mono text-[11px] font-bold tracking-[0.06em] uppercase">
-            Flagged as misleading or false information
+            Flagged as misleading by {{ current.flaggedBy }} ·
+            {{ current.flaggedAt | date: 'short' }}
           </span>
           @if (isModerator()) {
             <button nbButton tone="secondary" size="sm" type="button" (click)="unflag.emit()">
@@ -27,7 +30,7 @@ import { NbButton, NbCallout, NbSplit } from '@ng-brutalism/ui';
   `,
 })
 export class ModerationBar {
-  readonly isFlagged = input(false);
+  readonly flag = input<Flag | null>(null);
   readonly isModerator = input(false);
 
   readonly flagPost = output<void>();

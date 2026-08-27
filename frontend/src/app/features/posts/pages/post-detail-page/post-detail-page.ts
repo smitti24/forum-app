@@ -44,13 +44,13 @@ export class PostDetailPage {
     }
   }
 
-  protected async like(): Promise<void> {
-    await this.api.like(this.id());
+  protected async toggleLike(liked: boolean): Promise<void> {
+    await (liked ? this.api.unlike(this.id()) : this.api.like(this.id()));
     this.post.reload();
   }
 
-  protected async setFlag(isFlagged: boolean): Promise<void> {
-    await (isFlagged ? this.api.unflag(this.id()) : this.api.flag(this.id()));
+  protected async toggleFlag(flagged: boolean): Promise<void> {
+    await (flagged ? this.api.unflag(this.id()) : this.api.flag(this.id()));
     this.post.reload();
   }
 }

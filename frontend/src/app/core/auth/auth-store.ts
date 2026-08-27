@@ -12,8 +12,9 @@ export class AuthStore {
   readonly member = this._member.asReadonly();
 
   readonly isAuthenticated = computed(() => this._token() !== null);
-  readonly isModerator = computed(() => this._member()?.role === 'Moderator');
+  readonly isModerator = computed(() => this._member()?.role === 'moderator');
   readonly username = computed(() => this._member()?.username ?? null);
+  readonly memberId = computed(() => this._member()?.id ?? null);
 
   setToken(token: string, expiresAt: string): void {
     this._token.set(token);
